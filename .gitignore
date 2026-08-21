@@ -50,3 +50,10 @@ next-env.d.ts
 prisma/dev.db
 
 !.env.example
+
+# AI Agent Skills
+.agents/
+.claude/
+.windsurf/
+AGENTS.md
+CLAUDE.md
