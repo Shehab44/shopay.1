@@ -59,9 +59,20 @@ export async function POST(request: Request) {
     }
 
     // Process Products and Units
+    const skippedRecords: { matCode: string, barcode10: string }[] = [];
     const productsMap = new Map<string, any[]>();
+    
     for (const record of records) {
       const matCode = record.MatCode;
+      const barcode10 = record.Barcode10;
+
+      // Validate 10-digit barcode
+      if (!/^\d{10}$/.test(barcode10)) {
+        console.log(`Rejecting invalid barcode: ${barcode10} (MatCode: ${matCode})`);
+        skippedRecords.push({ matCode, barcode10 });
+        continue;
+      }
+
       if (!productsMap.has(matCode)) {
         productsMap.set(matCode, []);
       }
@@ -100,7 +111,14 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, processed: records.length });
+    return NextResponse.json({ 
+      success: true, 
+      processed: records.length - skippedRecords.length,
+      skippedRecords: {
+        count: skippedRecords.length,
+        records: skippedRecords
+      }
+    });
   } catch (error: any) {
     console.error('Commit error:', error);
     return NextResponse.json({ error: error.message || 'حدث خطأ أثناء حفظ التحديثات' }, { status: 500 });
