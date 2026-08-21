@@ -48,3 +48,5 @@ next-env.d.ts
 *.db
 *.db-journal
 prisma/dev.db
+
+!.env.example

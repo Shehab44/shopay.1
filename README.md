@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shopay - بوابتك للتسوق
 
-## Getting Started
+متجر إلكتروني بأسلوب متطور (مشابه لـ Amazon)، مبني باستخدام إطار العمل **Next.js**، **TypeScript**، و **Prisma** مع قاعدة بيانات **SQLite**.
 
-First, run the development server:
+## إعداد المشروع
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+لتشغيل المشروع محلياً على جهازك، اتبع الخطوات التالية:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **نسخ متغيرات البيئة:**
+   قم بنسخ ملف المتغيرات الأمثلة إلى ملف بيئة محلي:
+   ```bash
+   cp .env.example .env
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **تهيئة قاعدة البيانات:**
+   قم بتشغيل أوامر Prisma لتهيئة قاعدة البيانات SQLite:
+   ```bash
+   npx prisma migrate dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **تشغيل خادم التطوير:**
+   ابدأ تشغيل المشروع محلياً عبر الأمر التالي:
+   ```bash
+   npm run dev
+   ```
+   سيتم تشغيل المتجر على الرابط: `http://localhost:3000` (أو منفذ آخر إذا كان 3000 مشغولاً).
 
-## Learn More
+## آلية استيراد المنتجات (CSV Import)
 
-To learn more about Next.js, take a look at the following resources:
+يوفر النظام واجهة خاصة في لوحة الإدارة لاستيراد المنتجات وتحديثها بالجملة عبر ملفات Excel/CSV.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. توجه إلى الرابط `/admin/import` ضمن لوحة التحكم.
+2. قم برفع ملف CSV يحتوي على الأعمدة المطلوبة (مثل `MatCode`, `Barcode10`, `UnitRate`، إلخ).
+3. **شرط الباركود:** النظام يتحقق من عمود `Barcode10`. يجب أن يتكون الباركود من **10 أرقام بالضبط**. سيتم تجاوز (Skip) أي سجل لا يحقق هذا الشرط لحماية قاعدة البيانات من الإدخالات الخاطئة أو غير المتوافقة.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*تم توليد هذا التوثيق ليعكس الحالة الفعلية لبيئة تطوير Shopay.*
