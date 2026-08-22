@@ -8,7 +8,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const product = await prisma.product.findUnique({
     where: { matCode: id },
     include: {
-      units: true,
       category: true,
     }
   });

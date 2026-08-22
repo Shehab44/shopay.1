@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       columns: true,
       skip_empty_lines: true,
       trim: true,
-    });
+    }) as Record<string, any>[];
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ' }, { status: 400 });
@@ -58,46 +58,31 @@ export async function POST(request: Request) {
       categoryIdMap.set(prefix, category.id);
     }
 
-    // Process Products and Units
-    const productsMap = new Map<string, any[]>();
+    // Process Products
     for (const record of records) {
       const matCode = record.MatCode;
-      if (!productsMap.has(matCode)) {
-        productsMap.set(matCode, []);
-      }
-      productsMap.get(matCode)!.push(record);
-    }
-
-    // Let's use a transaction if possible, or just sequential updates
-    for (const [matCode, variants] of productsMap.entries()) {
-      const firstVariant = variants[0];
       const prefix = matCode.substring(0, 4);
       const categoryId = categoryIdMap.get(prefix);
 
-      const product = await prisma.product.upsert({
+      const price = parseFloat(record.Price) || 0;
+      const isActive = price > 0; // Hide 0-price products
+
+      await prisma.product.upsert({
         where: { matCode },
-        update: { nameAr: firstVariant.ProductName, categoryId },
-        create: { matCode, nameAr: firstVariant.ProductName, categoryId },
+        update: { 
+          nameAr: record.ProductName, 
+          categoryId,
+          price,
+          isActive
+        },
+        create: { 
+          matCode, 
+          nameAr: record.ProductName, 
+          categoryId,
+          price,
+          isActive
+        },
       });
-
-      let minRate = Infinity;
-      for (const v of variants) {
-        const rate = parseInt(v.UnitRate, 10);
-        if (rate < minRate) minRate = rate;
-      }
-
-      for (const v of variants) {
-        const barcode10 = v.Barcode10;
-        const unitRate = parseInt(v.UnitRate, 10);
-        const isDefault = unitRate === minRate;
-        const price = parseFloat(v.Price);
-
-        await prisma.productUnit.upsert({
-          where: { barcode10 },
-          update: { unitName: v.UnitName, unitRate, price, isDefaultUnit: isDefault },
-          create: { barcode10, unitName: v.UnitName, unitRate, price, isDefaultUnit: isDefault, productId: product.id },
-        });
-      }
     }
 
     return NextResponse.json({ success: true, processed: records.length });

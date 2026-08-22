@@ -23,7 +23,7 @@ export default async function AdminProductsPage({
   const total = await prisma.product.count({ where });
   const products = await prisma.product.findMany({
     where,
-    include: { category: true, units: true },
+    include: { category: true },
     skip: (page - 1) * limit,
     take: limit,
     orderBy: { id: "desc" },
@@ -75,12 +75,9 @@ export default async function AdminProductsPage({
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-sm">
-                      {product.units.map(u => (
-                        <div key={u.id}>
-                          <span className="font-semibold text-shopay-purple">${u.price.toFixed(2)}</span>
-                          <span className="text-shopay-black/50 text-xs mr-1">({u.unitName} - {u.unitRate})</span>
-                        </div>
-                      ))}
+                      <div>
+                        <span className="font-semibold text-shopay-purple">${product.price.toFixed(2)}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">

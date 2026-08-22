@@ -58,9 +58,9 @@ export default function CartPage() {
             
             <div className="divide-y divide-shopay-gray-light">
               {items.map((item) => (
-                <div key={item.unitId} className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                <div key={item.productId} className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                   <div className="relative w-24 h-24 bg-shopay-gray-light rounded-xl overflow-hidden shrink-0 border border-shopay-black/5">
-                    <ProductImage matCode={item.matCode} databaseImageUrl={item.imageUrl} alt={item.nameAr} fill className="object-cover" />
+                    <ProductImage matCode={item.matCode} databaseImageUrl={item.mainImageUrl} alt={item.nameAr} fill className="object-cover" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
@@ -69,7 +69,7 @@ export default function CartPage() {
                       {item.nameAr}
                     </Link>
                     <div className="text-shopay-purple font-semibold mt-1">
-                      ${item.price.toFixed(2)} <span className="text-shopay-black/50 text-sm font-normal">/ {item.unitName} ({item.unitRate} ق)</span>
+                      ${item.price.toFixed(2)}
                     </div>
                   </div>
                   
@@ -77,14 +77,14 @@ export default function CartPage() {
                     {/* Quantity Selector */}
                     <div className="flex items-center border border-shopay-gray-light rounded-full h-10 w-28 bg-shopay-white shrink-0">
                       <button 
-                        onClick={() => updateQuantity(item.unitId, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
                         className="w-8 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
                       >
                         -
                       </button>
                       <div className="flex-1 text-center font-bold text-sm">{item.quantity}</div>
                       <button 
-                        onClick={() => updateQuantity(item.unitId, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                         className="w-8 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
                       >
                         +
@@ -96,7 +96,7 @@ export default function CartPage() {
                     </div>
                     
                     <button 
-                      onClick={() => removeItem(item.unitId)}
+                      onClick={() => removeItem(item.productId)}
                       className="w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
                     >
                       <Trash2 className="w-5 h-5" />

@@ -41,7 +41,6 @@ export default function CheckoutPage() {
           ...formData,
           items: items.map(i => ({
             productId: i.productId,
-            unitId: i.unitId,
             quantity: i.quantity,
             price: i.price
           })),
@@ -60,7 +59,7 @@ export default function CheckoutPage() {
         msg += `العنوان: ${formData.address}%0A%0A`;
         msg += `*المنتجات:*%0A`;
         items.forEach(item => {
-          msg += `- ${item.nameAr} (${item.unitName}) x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}%0A`;
+          msg += `- ${item.nameAr} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}%0A`;
         });
         msg += `%0A*الإجمالي: $${getTotalPrice().toFixed(2)}*`;
         
@@ -199,13 +198,13 @@ export default function CheckoutPage() {
             
             <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2">
               {items.map(item => (
-                <div key={item.unitId} className="flex gap-3 items-start border-b border-shopay-black/5 pb-3 last:border-0">
+                <div key={item.productId} className="flex gap-3 items-start border-b border-shopay-black/5 pb-3 last:border-0">
                   <div className="w-12 h-12 bg-white rounded border border-shopay-black/10 shrink-0 overflow-hidden relative">
-                    <ProductImage matCode={item.matCode} databaseImageUrl={item.imageUrl} alt={item.nameAr} fill className="object-cover" />
+                    <ProductImage matCode={item.matCode} databaseImageUrl={item.mainImageUrl} alt={item.nameAr} fill className="object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-shopay-black truncate">{item.nameAr}</div>
-                    <div className="text-xs text-shopay-black/60">{item.unitName} x {item.quantity}</div>
+                    <div className="text-xs text-shopay-black/60">قطعة x {item.quantity}</div>
                     <div className="text-shopay-purple font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
                   </div>
                 </div>

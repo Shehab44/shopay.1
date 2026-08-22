@@ -31,7 +31,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/about" className="text-shopay-gray-light/80 hover:text-shopay-white text-sm transition-colors">من نحن</Link></li>
               <li><Link href="/faq" className="text-shopay-gray-light/80 hover:text-shopay-white text-sm transition-colors">الأسئلة الشائعة</Link></li>
-              <li><Link href="/wholesale" className="text-shopay-gray-light/80 hover:text-shopay-white text-sm transition-colors">عملاء الجملة</Link></li>
+
               <li><Link href="/contact" className="text-shopay-gray-light/80 hover:text-shopay-white text-sm transition-colors">اتصل بنا</Link></li>
             </ul>
           </div>

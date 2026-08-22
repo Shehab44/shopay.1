@@ -6,45 +6,22 @@ import { Prisma } from "@prisma/client";
 import { ShoppingCart, Check, Star, AlertCircle } from "lucide-react";
 import { useCartStore } from "@/lib/store/cartStore";
 
-type ProductWithUnits = Prisma.ProductGetPayload<{
-  include: { units: true; category: true }
+type ProductWithCategory = Prisma.ProductGetPayload<{
+  include: { category: true }
 }>;
 
-export default function ProductClient({ product }: { product: ProductWithUnits }) {
+export default function ProductClient({ product }: { product: ProductWithCategory }) {
   const addItem = useCartStore((state) => state.addItem);
   
-  // Sort units by unitRate so the smallest unit (piece) is first
-  const sortedUnits = [...product.units].sort((a, b) => a.unitRate - b.unitRate);
-  
-  const [selectedUnitId, setSelectedUnitId] = useState(
-    sortedUnits.find(u => u.isDefaultUnit)?.id || sortedUnits[0]?.id
-  );
-
   const [quantity, setQuantity] = useState(1);
-
-  const selectedUnit = sortedUnits.find(u => u.id === selectedUnitId) || sortedUnits[0];
-  const pieceUnit = sortedUnits[0]; // Assuming first is piece (rate=1)
-
-  // Calculate savings percentage
-  const calcSavingsPercent = (piece: typeof pieceUnit, bulk: typeof selectedUnit) => {
-    if (!piece || !bulk || piece.id === bulk.id) return 0;
-    const piecePriceInBulk = piece.price * bulk.unitRate;
-    const saved = piecePriceInBulk - bulk.price;
-    return saved > 0 ? Math.round((saved / piecePriceInBulk) * 100) : 0;
-  };
-
-  const savings = calcSavingsPercent(pieceUnit, selectedUnit);
 
   const handleAddToCart = () => {
     addItem({
       productId: product.id,
-      unitId: selectedUnit.id,
       nameAr: product.nameAr,
       matCode: product.matCode,
-      unitName: selectedUnit.unitName,
-      unitRate: selectedUnit.unitRate,
-      price: selectedUnit.price,
-      imageUrl: product.mainImageUrl || `/images/products/${product.matCode}.jpg`,
+      price: product.price,
+      mainImageUrl: product.mainImageUrl || `/images/products/${product.matCode}.jpg`,
       quantity,
     });
     alert('تم إضافة المنتج إلى السلة بنجاح!');
@@ -93,64 +70,10 @@ export default function ProductClient({ product }: { product: ProductWithUnits }
           </div>
 
           <div className="text-4xl font-bold text-shopay-purple mb-6">
-            ${selectedUnit.price.toFixed(2)}
+            ${product.price.toFixed(2)}
             <span className="text-base font-normal text-shopay-black/50 ml-2">
-              لكل {selectedUnit.unitName}
+              سعر المنتج
             </span>
-          </div>
-
-          {/* Unit Selector */}
-          <div className="mb-8">
-            <h3 className="font-semibold text-shopay-black mb-3">اختر خيار التعبئة:</h3>
-            <div className="flex flex-col gap-3">
-              {sortedUnits.map(unit => {
-                const isSelected = selectedUnitId === unit.id;
-                const unitSavings = calcSavingsPercent(pieceUnit, unit);
-                
-                return (
-                  <label 
-                    key={unit.id}
-                    className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
-                      isSelected ? 'border-shopay-purple bg-shopay-purple/5 ring-1 ring-shopay-purple' : 'border-shopay-gray-light hover:border-shopay-purple/50'
-                    }`}
-                  >
-                    <input 
-                      type="radio" 
-                      name="unit" 
-                      className="sr-only" 
-                      checked={isSelected}
-                      onChange={() => setSelectedUnitId(unit.id)}
-                    />
-                    
-                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ml-3 ${
-                      isSelected ? 'border-shopay-purple bg-shopay-purple' : 'border-shopay-black/20'
-                    }`}>
-                      {isSelected && <Check className="w-3 h-3 text-shopay-white" />}
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="font-semibold text-shopay-black">
-                        {unit.unitName} <span className="text-shopay-black/50 text-sm font-normal">({unit.unitRate} قطع)</span>
-                      </div>
-                      <div className="text-sm text-shopay-black/60">
-                        الباركود: {unit.barcode10}
-                      </div>
-                    </div>
-                    
-                    <div className="text-left flex flex-col items-end">
-                      <div className="font-bold text-shopay-purple text-lg">
-                        ${unit.price.toFixed(2)}
-                      </div>
-                      {unitSavings > 0 && (
-                        <div className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded font-bold">
-                          وفّر {unitSavings}%
-                        </div>
-                      )}
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
           </div>
 
           {/* Add to Cart */}

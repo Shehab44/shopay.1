@@ -25,12 +25,7 @@ export default async function Navbar() {
               </Link>
             </li>
           ))}
-          <li className="flex-shrink-0">
-            <Link href="/wholesale" className="text-shopay-purple font-bold text-sm transition-colors flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-shopay-purple animate-pulse"></span>
-              عروض الجملة
-            </Link>
-          </li>
+
         </ul>
       </div>
     </nav>

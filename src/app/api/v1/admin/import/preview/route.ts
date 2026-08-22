@@ -16,14 +16,14 @@ export async function POST(request: Request) {
       columns: true,
       skip_empty_lines: true,
       trim: true,
-    });
+    }) as Record<string, any>[];
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على بيانات صالحة' }, { status: 400 });
     }
 
     // Verify required columns
-    const firstRow = records[0];
+    const firstRow = records[0] as Record<string, any>;
     if (!firstRow.MatCode || !firstRow.ProductName || !firstRow.Price) {
       return NextResponse.json({ 
         error: 'الملف ينقصه أعمدة أساسية. يجب أن يحتوي على MatCode, ProductName, Price' 

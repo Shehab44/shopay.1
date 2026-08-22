@@ -20,37 +20,24 @@ model Category {
 }
 
 model Product {
-  id           Int           @id @default(autoincrement())
-  matCode      String        @unique @map("mat_code")
-  nameAr       String        @map("name_ar")
-  categoryId   Int?          @map("category_id")
-  category     Category?     @relation(fields: [categoryId], references: [id])
-  description  String?
-  mainImageUrl String?       @map("main_image_url")
-  isActive     Boolean       @default(true) @map("is_active")
-  isFeatured   Boolean       @default(false) @map("is_featured")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  units        ProductUnit[]
-  wishlistedBy Wishlist[]
-  reviews      Review[]
+  id             Int         @id @default(autoincrement())
+  matCode        String      @unique @map("mat_code")
+  nameAr         String      @map("name_ar")
+  categoryId     Int?        @map("category_id")
+  description    String?
+  mainImageUrl   String?     @map("main_image_url")
+  price          Float       @default(0)
+  stock_quantity Int         @default(0)
+  isActive       Boolean     @default(true) @map("is_active")
+  isFeatured     Boolean     @default(false) @map("is_featured")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  order_items    OrderItem[]
+  category       Category?   @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
+  wishlistedBy   Wishlist[]
 
   @@map("products")
-}
-
-model ProductUnit {
-  id            Int         @id @default(autoincrement())
-  productId     Int         @map("product_id")
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  barcode10     String      @unique @map("barcode_10")
-  unitName      String      @map("unit_name")
-  unitRate      Int         @default(1) @map("unit_rate")
-  price         Float
-  isDefaultUnit Boolean     @default(false) @map("is_default_unit")
-  stockQuantity Int         @default(0) @map("stock_quantity")
-  orderItems    OrderItem[]
-
-  @@map("product_units")
 }
 
 model User {
@@ -63,8 +50,8 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at")
   addresses    Address[]
   orders       Order[]
-  wishlist     Wishlist[]
   reviews      Review[]
+  wishlist     Wishlist[]
 
   @@map("users")
 }
@@ -72,12 +59,12 @@ model User {
 model Address {
   id          Int     @id @default(autoincrement())
   userId      Int?    @map("user_id")
-  user        User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   label       String?
   city        String?
   area        String?
   fullAddress String? @map("full_address")
   isDefault   Boolean @default(false) @map("is_default")
+  user        User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders      Order[]
 
   @@map("addresses")
@@ -86,9 +73,7 @@ model Address {
 model Order {
   id            Int         @id @default(autoincrement())
   userId        Int?        @map("user_id")
-  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   addressId     Int?        @map("address_id")
-  address       Address?    @relation(fields: [addressId], references: [id], onDelete: SetNull)
   status        String      @default("pending")
   paymentMethod String?     @map("payment_method")
   subtotal      Float?
@@ -97,27 +82,29 @@ model Order {
   notes         String?
   createdAt     DateTime    @default(now()) @map("created_at")
   items         OrderItem[]
+  address       Address?    @relation(fields: [addressId], references: [id])
+  user          User?       @relation(fields: [userId], references: [id])
 
   @@map("orders")
 }
 
 model OrderItem {
-  id               Int          @id @default(autoincrement())
-  orderId          Int?         @map("order_id")
-  order            Order?       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productUnitId    Int?         @map("product_unit_id")
-  productUnit      ProductUnit? @relation(fields: [productUnitId], references: [id], onDelete: SetNull)
+  id               Int      @id @default(autoincrement())
+  orderId          Int?     @map("order_id")
+  product_id       Int?
   quantity         Int
-  unitPriceAtOrder Float        @map("unit_price_at_order")
+  unitPriceAtOrder Float    @map("unit_price_at_order")
+  products         Product? @relation(fields: [product_id], references: [id])
+  order            Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
 
 model Wishlist {
   userId    Int     @map("user_id")
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId Int     @map("product_id")
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, productId])
   @@map("wishlist")
@@ -126,12 +113,12 @@ model Wishlist {
 model Review {
   id        Int      @id @default(autoincrement())
   productId Int?     @map("product_id")
-  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    Int?     @map("user_id")
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   rating    Int
   comment   String?
   createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
 }

@@ -1,24 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Prisma } from '@prisma/client';
 
 export type CartItem = {
-  productId: string;
-  unitId: string;
+  productId: number;
   nameAr: string;
   matCode: string;
-  unitName: string;
-  unitRate: number;
   price: number;
-  imageUrl: string;
+  mainImageUrl: string;
   quantity: number;
 };
 
 interface CartState {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (unitId: string) => void;
-  updateQuantity: (unitId: string, quantity: number) => void;
+  removeItem: (productId: number) => void;
+  updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -31,11 +27,11 @@ export const useCartStore = create<CartState>()(
       
       addItem: (newItem) => {
         set((state) => {
-          const existingItem = state.items.find((item) => item.unitId === newItem.unitId);
+          const existingItem = state.items.find((item) => item.productId === newItem.productId);
           if (existingItem) {
             return {
               items: state.items.map((item) =>
-                item.unitId === newItem.unitId
+                item.productId === newItem.productId
                   ? { ...item, quantity: item.quantity + newItem.quantity }
                   : item
               ),
@@ -45,20 +41,20 @@ export const useCartStore = create<CartState>()(
         });
       },
       
-      removeItem: (unitId) => {
+      removeItem: (productId) => {
         set((state) => ({
-          items: state.items.filter((item) => item.unitId !== unitId),
+          items: state.items.filter((item) => item.productId !== productId),
         }));
       },
       
-      updateQuantity: (unitId, quantity) => {
+      updateQuantity: (productId, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(unitId);
+          get().removeItem(productId);
           return;
         }
         set((state) => ({
           items: state.items.map((item) =>
-            item.unitId === unitId ? { ...item, quantity } : item
+            item.productId === productId ? { ...item, quantity } : item
           ),
         }));
       },
