@@ -7,7 +7,13 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
   const [showSplash, setShowSplash] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  const handleSkip = () => {
+    setShowSplash(false);
+    sessionStorage.setItem("hasSeenSplash", "true");
+  };
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
     if (hasSeenSplash) {
@@ -18,12 +24,8 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
       }, 3500);
       return () => clearTimeout(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleSkip = () => {
-    setShowSplash(false);
-    sessionStorage.setItem("hasSeenSplash", "true");
-  };
 
   if (!isMounted) return null;
 

@@ -11,6 +11,7 @@ export default function CartIcon() {
   
   // To avoid hydration mismatch, we only render the count after mounting on client
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

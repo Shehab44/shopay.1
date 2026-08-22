@@ -27,30 +27,17 @@ model Product {
   category     Category?     @relation(fields: [categoryId], references: [id])
   description  String?
   mainImageUrl String?       @map("main_image_url")
+  price        Float         @default(0)
+  stockQuantity Int          @default(0) @map("stock_quantity")
   isActive     Boolean       @default(true) @map("is_active")
   isFeatured   Boolean       @default(false) @map("is_featured")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
-  units        ProductUnit[]
+  orderItems   OrderItem[]
   wishlistedBy Wishlist[]
   reviews      Review[]
 
   @@map("products")
-}
-
-model ProductUnit {
-  id            Int         @id @default(autoincrement())
-  productId     Int         @map("product_id")
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  barcode10     String      @unique @map("barcode_10")
-  unitName      String      @map("unit_name")
-  unitRate      Int         @default(1) @map("unit_rate")
-  price         Float
-  isDefaultUnit Boolean     @default(false) @map("is_default_unit")
-  stockQuantity Int         @default(0) @map("stock_quantity")
-  orderItems    OrderItem[]
-
-  @@map("product_units")
 }
 
 model User {
@@ -102,13 +89,13 @@ model Order {
 }
 
 model OrderItem {
-  id               Int          @id @default(autoincrement())
-  orderId          Int?         @map("order_id")
-  order            Order?       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productUnitId    Int?         @map("product_unit_id")
-  productUnit      ProductUnit? @relation(fields: [productUnitId], references: [id], onDelete: SetNull)
+  id               Int      @id @default(autoincrement())
+  orderId          Int?     @map("order_id")
+  order            Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        Int?     @map("product_id")
+  product          Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   quantity         Int
-  unitPriceAtOrder Float        @map("unit_price_at_order")
+  unitPriceAtOrder Float    @map("unit_price_at_order")
 
   @@map("order_items")
 }

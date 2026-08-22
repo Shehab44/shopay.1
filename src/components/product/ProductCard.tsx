@@ -3,14 +3,11 @@ import ProductImage from '../ui/ProductImage';
 import { ShoppingCart } from 'lucide-react';
 import { Prisma } from '@prisma/client';
 
-type ProductWithUnits = Prisma.ProductGetPayload<{
-  include: { units: true, category: true }
+type ProductWithCategory = Prisma.ProductGetPayload<{
+  include: { category: true }
 }>;
 
-export default function ProductCard({ product }: { product: ProductWithUnits }) {
-  // Find default unit or first one
-  const defaultUnit = product.units.find(u => u.isDefaultUnit) || product.units[0];
-  const hasWholesale = product.units.length > 1;
+export default function ProductCard({ product }: { product: ProductWithCategory }) {
 
   return (
     <div className="bg-shopay-white rounded-xl border border-shopay-gray-light overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col group">
@@ -24,11 +21,6 @@ export default function ProductCard({ product }: { product: ProductWithUnits }) 
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {hasWholesale && (
-          <div className="absolute top-2 right-2 bg-shopay-purple text-shopay-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
-            متوفر بالجملة
-          </div>
-        )}
       </Link>
 
       {/* Content */}
@@ -43,10 +35,7 @@ export default function ProductCard({ product }: { product: ProductWithUnits }) 
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-shopay-gray-light/50">
           <div>
             <div className="text-shopay-purple font-bold text-lg">
-              ${defaultUnit?.price.toFixed(2)}
-            </div>
-            <div className="text-xs text-shopay-black/50">
-              لكل {defaultUnit?.unitName}
+              ${product.price.toFixed(2)}
             </div>
           </div>
           

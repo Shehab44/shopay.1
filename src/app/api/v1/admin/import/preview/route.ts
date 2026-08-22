@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { parse } from 'csv-parse/sync';
+import * as xlsx from 'xlsx';
 import prisma from '@/lib/db';
 
 export async function POST(request: Request) {
@@ -11,46 +11,65 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'لم يتم العثور على ملف' }, { status: 400 });
     }
 
-    const text = await file.text();
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    });
+    const buffer = await file.arrayBuffer();
+    const workbook = xlsx.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const records = xlsx.utils.sheet_to_json(worksheet);
 
     if (records.length === 0) {
-      return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على بيانات صالحة' }, { status: 400 });
+      return NextResponse.json({ error: 'الملف فارغ' }, { status: 400 });
     }
 
-    // Verify required columns
-    const firstRow = records[0];
-    if (!firstRow.MatCode || !firstRow.ProductName || !firstRow.Price) {
-      return NextResponse.json({ 
-        error: 'الملف ينقصه أعمدة أساسية. يجب أن يحتوي على MatCode, ProductName, Price' 
-      }, { status: 400 });
+    // Process Categories (first 3 digits of matCode)
+    const categoryPrefixes = new Set<string>();
+    const validRecords = [];
+    let updatedPrices = 0;
+    let newProducts = 0;
+    const errors: string[] = [];
+
+    // existing products map for quick check
+    const existingProducts = await prisma.product.findMany({ select: { matCode: true, price: true } });
+    const productMap = new Map(existingProducts.map(p => [p.matCode, p.price]));
+
+    for (const record of records as any[]) {
+      const code = String(record['الرمز'] || record['Code'] || record['الكود'] || '');
+      const priceStr = record['السعر الإفرادي'] || record['Price'] || record['السعر'];
+      
+      const rawPrice = Number(priceStr);
+      const price = isNaN(rawPrice) ? 0 : rawPrice;
+
+      if (!code || code.length !== 7) {
+        errors.push(`كود غير صالح: ${code} - يجب أن يكون 7 خانات`);
+        continue;
+      }
+
+      const prefix = code.substring(0, 3);
+      categoryPrefixes.add(prefix);
+      
+      if (productMap.has(code)) {
+        if (productMap.get(code) !== price) {
+          updatedPrices++;
+        }
+      } else {
+        newProducts++;
+      }
+      
+      validRecords.push({
+        code,
+        price
+      });
     }
-
-    // Group by MatCode just to count unique products
-    const uniqueMatCodes = new Set(records.map((r: any) => r.MatCode));
-    
-    // Fetch existing products to compare
-    const existingProductsCount = await prisma.product.count({
-      where: { matCode: { in: Array.from(uniqueMatCodes) as string[] } }
-    });
-
-    const newProducts = uniqueMatCodes.size - existingProductsCount;
-    // In a real advanced preview, we'd compare prices exactly. For now, we estimate based on records length.
-    const updatedPrices = records.length; 
 
     return NextResponse.json({
-      totalRows: records.length,
-      updatedPrices: existingProductsCount > 0 ? updatedPrices : 0, // Simplified for demo
-      newProducts: newProducts > 0 ? newProducts : 0,
-      errors: [],
+      totalRows: validRecords.length,
+      updatedPrices,
+      newProducts,
+      errors: errors.slice(0, 20), // limit errors returned
     });
 
   } catch (error: any) {
     console.error('Preview error:', error);
-    return NextResponse.json({ error: error.message || 'حدث خطأ غير متوقع' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'حدث خطأ داخلي' }, { status: 500 });
   }
 }

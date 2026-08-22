@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server';
-import { parse } from 'csv-parse/sync';
+import * as xlsx from 'xlsx';
 import prisma from '@/lib/db';
 
 const CATEGORY_MAP: Record<string, string> = {
-  '0101': 'أجهزة كهربائية وسخانات',
-  '0102': 'مستلزمات كهربائية',
-  '0103': 'أدوات منزلية ومطبخ',
-  '0104': 'مستلزمات منزلية ونظافة صحية',
-  '0105': 'أزياء وإكسسوارات رأس',
-  '0106': 'ألعاب أطفال',
-  '0107': 'مستحضرات تجميل وعناية',
-  '0108': 'إكسسوارات شعر',
-  '0109': 'مستلزمات أطفال',
-  '0110': 'أحذية',
-  '0111': 'طاقة وأجهزة إنفرتر',
-  '0112': 'عدة وأدوات ورشة',
-  '0113': 'أدوات تنظيف',
-  '0114': 'جلديات وأدوات رياضية',
+  '101': 'أجهزة كهربائية وسخانات',
+  '102': 'مستلزمات كهربائية',
+  '103': 'أدوات منزلية ومطبخ',
+  '104': 'مستلزمات منزلية ونظافة صحية',
+  '105': 'أزياء وإكسسوارات رأس',
+  '106': 'ألعاب أطفال',
+  '107': 'مستحضرات تجميل وعناية',
+  '108': 'إكسسوارات شعر',
+  '109': 'مستلزمات أطفال',
+  '110': 'أحذية',
+  '111': 'طاقة وأجهزة إنفرتر',
+  '112': 'عدة وأدوات ورشة',
+  '113': 'أدوات تنظيف',
+  '114': 'جلديات وأدوات رياضية',
 };
 
 export async function POST(request: Request) {
@@ -28,12 +28,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'لم يتم العثور على ملف' }, { status: 400 });
     }
 
-    const text = await file.text();
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    });
+    const buffer = await file.arrayBuffer();
+    const workbook = xlsx.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const records = xlsx.utils.sheet_to_json(worksheet);
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ' }, { status: 400 });
@@ -41,14 +40,15 @@ export async function POST(request: Request) {
 
     // Process Categories
     const categoryPrefixes = new Set<string>();
-    for (const record of records) {
-      if (record.MatCode && record.MatCode.length >= 4) {
-        categoryPrefixes.add(record.MatCode.substring(0, 4));
+    for (const record of records as any[]) {
+      const code = String(record['الرمز'] || record['Code'] || record['الكود'] || '');
+      if (code && code.length === 7) {
+        categoryPrefixes.add(code.substring(0, 3));
       }
     }
 
     const categoryIdMap = new Map<string, number>();
-    for (const prefix of categoryPrefixes) {
+    for (const prefix of Array.from(categoryPrefixes)) {
       const nameAr = CATEGORY_MAP[prefix] || `قسم ${prefix}`;
       const category = await prisma.category.upsert({
         where: { codePrefix: prefix },
@@ -58,69 +58,78 @@ export async function POST(request: Request) {
       categoryIdMap.set(prefix, category.id);
     }
 
-    // Process Products and Units
-    const skippedRecords: { matCode: string, barcode10: string }[] = [];
-    const productsMap = new Map<string, any[]>();
-    
-    for (const record of records) {
-      const matCode = record.MatCode;
-      const barcode10 = record.Barcode10;
+    // Import Products
+    const productsToCreate = [];
+    const productsToUpdate = [];
+    const existingProducts = await prisma.product.findMany({ select: { matCode: true } });
+    const existingSet = new Set(existingProducts.map(p => p.matCode));
 
-      // Validate 10-digit barcode
-      if (!/^\d{10}$/.test(barcode10)) {
-        console.log(`Rejecting invalid barcode: ${barcode10} (MatCode: ${matCode})`);
-        skippedRecords.push({ matCode, barcode10 });
-        continue;
-      }
+    for (const record of records as any[]) {
+      const code = String(record['الرمز'] || record['Code'] || record['الكود'] || '');
+      const name = String(record['الاسم'] || record['Name'] || record['اسم المادة'] || '');
+      const priceStr = record['السعر الإفرادي'] || record['Price'] || record['السعر'];
+      
+      const rawPrice = Number(priceStr);
+      const price = isNaN(rawPrice) ? 0 : rawPrice;
+      
+      if (!code || code.length !== 7) continue;
 
-      if (!productsMap.has(matCode)) {
-        productsMap.set(matCode, []);
-      }
-      productsMap.get(matCode)!.push(record);
-    }
-
-    // Let's use a transaction if possible, or just sequential updates
-    for (const [matCode, variants] of productsMap.entries()) {
-      const firstVariant = variants[0];
-      const prefix = matCode.substring(0, 4);
+      const prefix = code.substring(0, 3);
       const categoryId = categoryIdMap.get(prefix);
 
-      const product = await prisma.product.upsert({
-        where: { matCode },
-        update: { nameAr: firstVariant.ProductName, categoryId },
-        create: { matCode, nameAr: firstVariant.ProductName, categoryId },
-      });
+      const isActive = price > 0; // zero price -> inactive
 
-      let minRate = Infinity;
-      for (const v of variants) {
-        const rate = parseInt(v.UnitRate, 10);
-        if (rate < minRate) minRate = rate;
-      }
-
-      for (const v of variants) {
-        const barcode10 = v.Barcode10;
-        const unitRate = parseInt(v.UnitRate, 10);
-        const isDefault = unitRate === minRate;
-        const price = parseFloat(v.Price);
-
-        await prisma.productUnit.upsert({
-          where: { barcode10 },
-          update: { unitName: v.UnitName, unitRate, price, isDefaultUnit: isDefault },
-          create: { barcode10, unitName: v.UnitName, unitRate, price, isDefaultUnit: isDefault, productId: product.id },
+      if (existingSet.has(code)) {
+        productsToUpdate.push({
+          matCode: code,
+          nameAr: name,
+          price,
+          categoryId,
+          isActive
+        });
+      } else {
+        productsToCreate.push({
+          matCode: code,
+          nameAr: name,
+          price,
+          categoryId,
+          isActive
         });
       }
     }
 
+    // SQLite can lock, so we use transaction sequentially or promise.all
+    // For small batches, Prisma's transactions are fine.
+    
+    // Create new
+    if (productsToCreate.length > 0) {
+      await prisma.product.createMany({
+        data: productsToCreate,
+      });
+    }
+
+    // Update existing (Prisma doesn't have updateMany with different values per row easily in sqlite)
+    // We update sequentially in chunks
+    for (const product of productsToUpdate) {
+      await prisma.product.update({
+        where: { matCode: product.matCode },
+        data: {
+          nameAr: product.nameAr,
+          price: product.price,
+          categoryId: product.categoryId,
+          isActive: product.isActive
+        }
+      });
+    }
+
     return NextResponse.json({ 
       success: true, 
-      processed: records.length - skippedRecords.length,
-      skippedRecords: {
-        count: skippedRecords.length,
-        records: skippedRecords
-      }
+      imported: productsToCreate.length,
+      updated: productsToUpdate.length 
     });
+
   } catch (error: any) {
     console.error('Commit error:', error);
-    return NextResponse.json({ error: error.message || 'حدث خطأ أثناء حفظ التحديثات' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'حدث خطأ داخلي' }, { status: 500 });
   }
 }

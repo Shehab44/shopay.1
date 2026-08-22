@@ -39,11 +39,10 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          items: items.map(i => ({
-            productId: i.productId,
-            unitId: i.unitId,
-            quantity: i.quantity,
-            price: i.price
+          items: items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPriceAtOrder: item.price,
           })),
           totalAmount: getTotalPrice(),
         }),
@@ -199,14 +198,16 @@ export default function CheckoutPage() {
             
             <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2">
               {items.map(item => (
-                <div key={item.unitId} className="flex gap-3 items-start border-b border-shopay-black/5 pb-3 last:border-0">
-                  <div className="w-12 h-12 bg-white rounded border border-shopay-black/10 shrink-0 overflow-hidden relative">
-                    <ProductImage matCode={item.matCode} databaseImageUrl={item.imageUrl} alt={item.nameAr} fill className="object-cover" />
+                <div key={item.productId} className="flex items-center gap-4 py-4 first:pt-0">
+                  <div className="relative w-16 h-16 bg-shopay-gray-light rounded-lg overflow-hidden shrink-0 border border-shopay-black/5">
+                    <ProductImage matCode={item.matCode} databaseImageUrl={item.mainImageUrl} alt={item.nameAr} fill className="object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-shopay-black truncate">{item.nameAr}</div>
-                    <div className="text-xs text-shopay-black/60">{item.unitName} x {item.quantity}</div>
-                    <div className="text-shopay-purple font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="font-bold text-shopay-black text-sm truncate">{item.nameAr}</div>
+                    <div className="text-shopay-black/50 text-xs mt-1">{item.quantity} × {item.unitName}</div>
+                  </div>
+                  <div className="font-bold text-shopay-purple">
+                    ${(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}

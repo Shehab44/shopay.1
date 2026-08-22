@@ -113,13 +113,13 @@ export default function AdminImportPage() {
         
         <input 
           type="file" 
-          accept=".csv"
+          accept=".xlsx,.csv"
           onChange={handleFileChange}
           className="hidden" 
-          id="csv-upload"
+          id="file-upload"
         />
         <label 
-          htmlFor="csv-upload" 
+          htmlFor="file-upload" 
           className="inline-block px-6 py-2 bg-shopay-gray-light text-shopay-black font-semibold rounded-lg cursor-pointer hover:bg-shopay-gray-light/80 transition-colors"
         >
           تصفح الملفات

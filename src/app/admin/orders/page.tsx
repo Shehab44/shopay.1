@@ -9,9 +9,7 @@ export default async function AdminOrdersPage() {
       address: true,
       items: {
         include: {
-          productUnit: {
-            include: { product: true }
-          }
+          product: true
         }
       }
     },

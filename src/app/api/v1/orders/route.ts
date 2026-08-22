@@ -17,8 +17,8 @@ export async function POST(request: Request) {
       user = await prisma.user.create({
         data: {
           phone,
-          firstName: name.split(' ')[0] || name,
-          lastName: name.split(' ').slice(1).join(' ') || '',
+          fullName: name,
+          passwordHash: "GUEST",
         }
       });
     }
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const savedAddress = await prisma.address.create({
       data: {
         userId: user.id,
-        streetAddress: address,
+        fullAddress: address,
         city: "غير محدد",
         isDefault: true,
       }
@@ -44,10 +44,8 @@ export async function POST(request: Request) {
         items: {
           create: items.map((item: any) => ({
             productId: item.productId,
-            productUnitId: item.unitId,
             quantity: item.quantity,
-            unitPrice: item.price,
-            totalPrice: item.price * item.quantity,
+            unitPriceAtOrder: item.unitPriceAtOrder || item.price,
           }))
         }
       },

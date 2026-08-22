@@ -3,40 +3,8 @@ import ProductCard from "@/components/product/ProductCard";
 import { PackageOpen } from "lucide-react";
 
 export default async function WholesalePage() {
-  // Fetch products that have more than 1 unit (i.e. they have wholesale options)
-  // Since we can't easily filter by relation count in a simple way in SQLite without an extra field, 
-  // we'll fetch products and include units, then filter in JS, 
-  // OR we can just fetch a good chunk of products that we know are featured/wholesale.
-  // For now, let's fetch products and filter in JS (good enough for 6000 products if we limit it).
-  
-  // Actually, we can query units where unitRate > 1, get unique product IDs.
-  const wholesaleUnits = await prisma.productUnit.findMany({
-    where: {
-      unitRate: {
-        gt: 1
-      }
-    },
-    select: {
-      productId: true
-    },
-    distinct: ['productId'],
-    take: 50 // limit to 50 for performance
-  });
-
-  const productIds = wholesaleUnits.map(u => u.productId);
-
-  const products = await prisma.product.findMany({
-    where: {
-      id: {
-        in: productIds
-      },
-      isActive: true
-    },
-    include: {
-      units: true,
-      category: true
-    }
-  });
+  // Wholesale options removed per architecture simplification
+  const products: any[] = [];
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">

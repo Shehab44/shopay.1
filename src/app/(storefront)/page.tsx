@@ -8,23 +8,18 @@ export default async function Home() {
   // Fetch products
   const featuredProducts = await prisma.product.findMany({
     take: 8,
-    include: { units: true, category: true },
+    include: { category: true },
     orderBy: { id: 'asc' }
   });
 
   const newProducts = await prisma.product.findMany({
     take: 8,
-    include: { units: true, category: true },
+    include: { category: true },
     orderBy: { id: 'desc' }
   });
 
-  // Fetch some products that have wholesale options (multiple units)
-  // Since Prisma + SQLite doesn't easily filter by relation count, we fetch a bit more and filter in memory for demo
-  const possibleWholesale = await prisma.product.findMany({
-    take: 40,
-    include: { units: true, category: true },
-  });
-  const wholesaleProducts = possibleWholesale.filter(p => p.units.length > 1).slice(0, 8);
+  // Wholesale section removed as per schema simplification
+  const wholesaleProducts: any[] = [];
 
   return (
     <div className="flex flex-col gap-12 pb-16">
