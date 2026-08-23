@@ -47,3 +47,6 @@ next-env.d.ts
 # Database
 *.db
 *.db-journal
+
+# Dev tools
+/scripts/dev-tools/
