@@ -27,7 +27,7 @@ model Product {
   description    String?
   mainImageUrl   String?     @map("main_image_url")
   price          Float       @default(0)
-  stock_quantity Int         @default(0)
+  stockQuantity  Int         @default(0) @map("stock_quantity")
   isActive       Boolean     @default(true) @map("is_active")
   isFeatured     Boolean     @default(false) @map("is_featured")
   createdAt      DateTime    @default(now()) @map("created_at")
@@ -91,10 +91,10 @@ model Order {
 model OrderItem {
   id               Int      @id @default(autoincrement())
   orderId          Int?     @map("order_id")
-  product_id       Int?
+  productId        Int?     @map("product_id")
   quantity         Int
   unitPriceAtOrder Float    @map("unit_price_at_order")
-  products         Product? @relation(fields: [product_id], references: [id])
+  product          Product? @relation(fields: [productId], references: [id])
   order            Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("order_items")

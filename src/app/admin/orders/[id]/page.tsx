@@ -69,11 +69,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             </div>
             <div className="flex justify-between border-b pb-2">
               <span className="text-shopay-black/50">المنطقة</span>
-              <span className="font-semibold">{order.address?.region || '-'}</span>
+              <span className="font-semibold">{order.address?.area || '-'}</span>
             </div>
             <div className="flex flex-col gap-1 border-b pb-2">
               <span className="text-shopay-black/50">التفاصيل</span>
-              <span className="font-semibold leading-relaxed">{order.address?.details}</span>
+              <span className="font-semibold leading-relaxed">{order.address?.fullAddress}</span>
             </div>
           </div>
         </div>
@@ -100,10 +100,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               {order.items.map((item) => (
                 <tr key={item.id}>
                   <td className="px-4 py-3 font-semibold">
-                    {item.products?.nameAr || 'منتج غير معروف'}
+                    {item.product?.nameAr || 'منتج غير معروف'}
                   </td>
                   <td className="px-4 py-3 text-shopay-black/70 font-mono text-sm">
-                    {item.products?.matCode || '-'}
+                    {item.product?.matCode || '-'}
                   </td>
                   <td className="px-4 py-3">${item.unitPriceAtOrder?.toFixed(2) || '0.00'}</td>
                   <td className="px-4 py-3">{item.quantity}</td>
