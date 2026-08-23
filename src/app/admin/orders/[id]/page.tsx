@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import { notFound } from "next/navigation";
 import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
@@ -105,10 +106,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                   <td className="px-4 py-3 text-shopay-black/70 font-mono text-sm">
                     {item.product?.matCode || '-'}
                   </td>
-                  <td className="px-4 py-3">${item.unitPriceAtOrder?.toFixed(2) || '0.00'}</td>
+                  <td className="px-4 py-3">{CURRENCY_SYMBOL}{item.unitPriceAtOrder?.toFixed(2) || '0.00'}</td>
                   <td className="px-4 py-3">{item.quantity}</td>
                   <td className="px-4 py-3 font-bold text-shopay-purple">
-                    ${((item.unitPriceAtOrder || 0) * item.quantity).toFixed(2)}
+                    {CURRENCY_SYMBOL}{((item.unitPriceAtOrder || 0) * item.quantity).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -117,7 +118,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               <tr>
                 <td colSpan={4} className="px-4 py-4 text-left font-bold text-lg">المجموع الكلي</td>
                 <td className="px-4 py-4 font-black text-xl text-shopay-purple">
-                  ${order.total?.toFixed(2) || '0.00'}
+                  {CURRENCY_SYMBOL}{order.total?.toFixed(2) || '0.00'}
                 </td>
               </tr>
             </tfoot>

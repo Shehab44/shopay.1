@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -61,9 +62,9 @@ export default function CheckoutPage() {
         msg += `العنوان: ${formData.address}%0A%0A`;
         msg += `*المنتجات:*%0A`;
         items.forEach(item => {
-          msg += `- ${item.nameAr} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}%0A`;
+          msg += `- ${item.nameAr} x ${item.quantity} = ${CURRENCY_SYMBOL}${(item.price * item.quantity).toFixed(2)}%0A`;
         });
-        msg += `%0A*الإجمالي: $${getTotalPrice().toFixed(2)}*`;
+        msg += `%0A*الإجمالي: ${CURRENCY_SYMBOL}${getTotalPrice().toFixed(2)}*`;
         
         window.open(`https://wa.me/96100000000?text=${msg}`, '_blank');
       }
@@ -220,7 +221,7 @@ export default function CheckoutPage() {
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-shopay-black truncate">{item.nameAr}</div>
                     <div className="text-xs text-shopay-black/60">قطعة x {item.quantity}</div>
-                    <div className="text-shopay-purple font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="text-shopay-purple font-bold text-sm">{CURRENCY_SYMBOL}{(item.price * item.quantity).toFixed(2)}</div>
                   </div>
                 </div>
               ))}
@@ -228,7 +229,7 @@ export default function CheckoutPage() {
             
             <div className="border-t border-shopay-black/10 pt-4 flex items-center justify-between">
               <span className="font-bold text-shopay-black">المجموع الكلي</span>
-              <span className="font-bold text-shopay-purple text-xl">${getTotalPrice().toFixed(2)}</span>
+              <span className="font-bold text-shopay-purple text-xl">{CURRENCY_SYMBOL}{getTotalPrice().toFixed(2)}</span>
             </div>
           </div>
         </div>

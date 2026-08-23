@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import Link from "next/link";
 import { Eye, Clock } from "lucide-react";
@@ -50,7 +51,7 @@ export default async function AdminOrdersPage() {
                     <div className="text-shopay-black/50 text-sm">{order.user?.phone}</div>
                   </td>
                   <td className="px-6 py-4 font-bold text-shopay-purple">
-                    ${order.total?.toFixed(2)}
+                    {CURRENCY_SYMBOL}{order.total?.toFixed(2)}
                   </td>
                   <td className="px-6 py-4">
                     <OrderStatusSelect orderId={order.id} initialStatus={order.status} />

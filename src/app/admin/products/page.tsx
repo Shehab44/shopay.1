@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import Link from "next/link";
 import { Search, Edit } from "lucide-react";
@@ -76,7 +77,7 @@ export default async function AdminProductsPage({
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-sm">
                       <div>
-                        <span className="font-semibold text-shopay-purple">${product.price.toFixed(2)}</span>
+                        <span className="font-semibold text-shopay-purple">{CURRENCY_SYMBOL}{product.price.toFixed(2)}</span>
                       </div>
                     </div>
                   </td>

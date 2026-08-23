@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 "use client";
 
 import { useState } from "react";
@@ -70,7 +71,7 @@ export default function ProductClient({ product }: { product: ProductWithCategor
           </div>
 
           <div className="text-4xl font-bold text-shopay-purple mb-6">
-            ${product.price.toFixed(2)}
+            {CURRENCY_SYMBOL}{product.price.toFixed(2)}
             <span className="text-base font-normal text-shopay-black/50 ml-2">
               سعر المنتج
             </span>

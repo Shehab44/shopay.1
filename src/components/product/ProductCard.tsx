@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 import Link from 'next/link';
 import ProductImage from '../ui/ProductImage';
 import { Prisma } from '@prisma/client';
@@ -34,7 +35,7 @@ export default function ProductCard({ product }: { product: ProductWithCategory 
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-shopay-gray-light/50">
           <div>
             <div className="text-shopay-purple font-bold text-lg">
-              ${product.price.toFixed(2)}
+              {CURRENCY_SYMBOL}{product.price.toFixed(2)}
             </div>
             <div className="text-xs text-shopay-black/50">
               سعر المنتج

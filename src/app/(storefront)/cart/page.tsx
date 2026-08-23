@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -69,7 +70,7 @@ export default function CartPage() {
                       {item.nameAr}
                     </Link>
                     <div className="text-shopay-purple font-semibold mt-1">
-                      ${item.price.toFixed(2)}
+                      {CURRENCY_SYMBOL}{item.price.toFixed(2)}
                     </div>
                   </div>
                   
@@ -92,7 +93,7 @@ export default function CartPage() {
                     </div>
                     
                     <div className="font-bold text-shopay-black text-lg min-w-[80px] text-left">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {CURRENCY_SYMBOL}{(item.price * item.quantity).toFixed(2)}
                     </div>
                     
                     <button 
@@ -116,7 +117,7 @@ export default function CartPage() {
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between text-shopay-black/70">
                 <span>المجموع الفرعي</span>
-                <span className="font-semibold text-shopay-black">${getTotalPrice().toFixed(2)}</span>
+                <span className="font-semibold text-shopay-black">{CURRENCY_SYMBOL}{getTotalPrice().toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-shopay-black/70">
                 <span>رسوم التوصيل</span>
@@ -127,7 +128,7 @@ export default function CartPage() {
             <div className="border-t border-shopay-black/10 pt-4 mb-8">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-shopay-black text-lg">الإجمالي</span>
-                <span className="font-bold text-shopay-purple text-2xl">${getTotalPrice().toFixed(2)}</span>
+                <span className="font-bold text-shopay-purple text-2xl">{CURRENCY_SYMBOL}{getTotalPrice().toFixed(2)}</span>
               </div>
             </div>
             
