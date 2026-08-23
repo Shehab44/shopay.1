@@ -4,9 +4,9 @@ import prisma from '@/lib/db';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone, address, notes, items, totalAmount } = body;
+    const { name, phone, city, address, notes, items, totalAmount } = body;
 
-    if (!name || !phone || !address || !items || items.length === 0) {
+    if (!name || !phone || !city || !address || !items || items.length === 0) {
       return NextResponse.json({ error: 'بيانات الطلب غير مكتملة' }, { status: 400 });
     }
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       data: {
         userId: user.id,
         fullAddress: address,
-        city: "غير محدد",
+        city: city,
         isDefault: true,
       }
     });
