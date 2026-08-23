@@ -117,12 +117,12 @@ export default async function AdminProductsPage({
           </div>
           <div className="flex gap-2">
             {page > 1 && (
-              <Link href={`/admin/products?page=${page - 1}${q ? '&q='+q : ''}`} className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
+              <Link href={`/admin/products?page=${page - 1}${q ? '&q='+q : ''}`} aria-label="الصفحة السابقة" className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
                 السابق
               </Link>
             )}
             {page * limit < total && (
-              <Link href={`/admin/products?page=${page + 1}${q ? '&q='+q : ''}`} className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
+              <Link href={`/admin/products?page=${page + 1}${q ? '&q='+q : ''}`} aria-label="الصفحة التالية" className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
                 التالي
               </Link>
             )}

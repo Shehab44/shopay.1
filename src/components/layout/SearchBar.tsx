@@ -25,9 +25,10 @@ export default function SearchBar({ className = "" }: { className?: string }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="ابحث عن منتج أو رمز..." 
+        aria-label="ابحث عن المنتجات"
         className="w-full bg-shopay-gray-light text-shopay-black px-4 py-2 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-shopay-purple/50"
       />
-      <button type="submit" className="absolute right-3 top-2.5 text-shopay-black/50 hover:text-shopay-purple">
+      <button type="submit" aria-label="تنفيذ البحث" className="absolute right-3 top-2.5 text-shopay-black/50 hover:text-shopay-purple">
         <Search className="w-5 h-5" />
       </button>
     </form>

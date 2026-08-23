@@ -43,6 +43,7 @@ export default function CategoryFilters() {
           <input 
             type="number" 
             placeholder="من" 
+            aria-label="الحد الأدنى للسعر"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
             className="w-full p-2 text-sm rounded bg-shopay-white border border-shopay-gray-light focus:outline-none focus:ring-2 focus:ring-shopay-purple/50" 
@@ -51,6 +52,7 @@ export default function CategoryFilters() {
           <input 
             type="number" 
             placeholder="إلى" 
+            aria-label="الحد الأعلى للسعر"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
             className="w-full p-2 text-sm rounded bg-shopay-white border border-shopay-gray-light focus:outline-none focus:ring-2 focus:ring-shopay-purple/50" 
@@ -58,6 +60,7 @@ export default function CategoryFilters() {
         </div>
         <button 
           onClick={() => applyFilters()}
+          aria-label="تطبيق فلتر السعر"
           className="w-full bg-shopay-purple text-white text-sm font-bold py-2 rounded hover:bg-shopay-black transition-colors"
         >
           تطبيق السعر
@@ -69,6 +72,7 @@ export default function CategoryFilters() {
         <select 
           value={currentSort}
           onChange={(e) => applyFilters(e.target.value)}
+          aria-label="فرز المنتجات"
           className="w-full p-2 text-sm rounded bg-shopay-white border border-shopay-gray-light focus:outline-none focus:ring-2 focus:ring-shopay-purple/50"
         >
           <option value="newest">الأحدث</option>
