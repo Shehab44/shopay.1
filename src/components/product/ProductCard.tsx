@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import ProductImage from '../ui/ProductImage';
-import { ShoppingCart } from 'lucide-react';
 import { Prisma } from '@prisma/client';
+import AddToCartButton from './AddToCartButton';
 
 type ProductWithCategory = Prisma.ProductGetPayload<{
   include: { category: true }
@@ -40,10 +40,7 @@ export default function ProductCard({ product }: { product: ProductWithCategory 
               سعر المنتج
             </div>
           </div>
-          
-          <button className="w-10 h-10 rounded-full bg-shopay-gray-light flex items-center justify-center text-shopay-black hover:bg-shopay-gradient hover:text-shopay-white transition-all duration-300 shadow-sm active:scale-95" aria-label="أضف للسلة">
-            <ShoppingCart className="w-5 h-5" />
-          </button>
+          <AddToCartButton product={product} />
         </div>
       </div>
     </div>
