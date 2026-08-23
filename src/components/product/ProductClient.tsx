@@ -1,5 +1,5 @@
-import { CURRENCY_SYMBOL } from "@/lib/constants";
 "use client";
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 import { useState } from "react";
 import ProductImage from "../ui/ProductImage";
