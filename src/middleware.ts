@@ -1,28 +1,38 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export default withAuth(
+  function middleware(req) {
+    const { pathname } = req.nextUrl;
+    const { token } = req.nextauth;
 
-  // Protect /admin and /api/v1/admin
-  if (pathname.startsWith('/admin') || pathname.startsWith('/api/v1/admin')) {
-    // Exclude the login page and auth api
-    if (pathname === '/admin/login' || pathname === '/api/v1/admin/auth') {
-      return NextResponse.next();
-    }
-
-    const adminToken = request.cookies.get('admin_token')?.value;
-    
-    if (!adminToken || adminToken !== 'authenticated') {
-      if (pathname.startsWith('/api/v1/admin')) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Admin routes protection
+    if (pathname.startsWith("/admin") || pathname.startsWith("/api/v1/admin")) {
+      if (token?.role !== "admin") {
+        if (pathname.startsWith("/api/v1/admin")) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        return NextResponse.redirect(new URL("/login", req.url));
       }
-      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  },
+  {
+    callbacks: {
+      authorized: ({ token, req }) => {
+        const { pathname } = req.nextUrl;
+        
+        // Only trigger middleware for these specific routes
+        if (pathname.startsWith("/admin") || pathname.startsWith("/api/v1/admin")) {
+          return !!token; // Must be logged in
+        }
+        return true; // Public routes pass through
+      },
+    },
+    pages: {
+      signIn: '/login',
     }
   }
-
-  return NextResponse.next();
-}
+);
 
 export const config = {
   matcher: ['/admin/:path*', '/api/v1/admin/:path*'],
