@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 import Link from "next/link";
-import { Eye, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Eye, Clock } from "lucide-react";
+import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
@@ -52,29 +53,12 @@ export default async function AdminOrdersPage() {
                     ${order.total?.toFixed(2)}
                   </td>
                   <td className="px-6 py-4">
-                    {order.status === 'pending' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-orange-100 text-orange-700">
-                        <Clock className="w-3 h-3" />
-                        قيد الانتظار
-                      </span>
-                    )}
-                    {order.status === 'completed' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-700">
-                        <CheckCircle className="w-3 h-3" />
-                        مكتمل
-                      </span>
-                    )}
-                    {order.status === 'cancelled' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-700">
-                        <XCircle className="w-3 h-3" />
-                        ملغي
-                      </span>
-                    )}
+                    <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
                   </td>
                   <td className="px-6 py-4">
-                    <button className="text-shopay-black/50 hover:text-shopay-purple p-2 bg-shopay-gray-light rounded-lg transition-colors">
+                    <Link href={`/admin/orders/${order.id}`} className="inline-block text-shopay-black/50 hover:text-shopay-purple p-2 bg-shopay-gray-light rounded-lg transition-colors">
                       <Eye className="w-4 h-4" />
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
