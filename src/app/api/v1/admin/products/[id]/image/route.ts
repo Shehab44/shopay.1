@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { writeFile } from 'fs/promises';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 1. Verify Authentication (Extra Layer)
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+    }
+
+    // 2. Validate Product
     const resolvedParams = await params;
     const id = parseInt(resolvedParams.id);
     if (isNaN(id)) {
@@ -19,6 +34,7 @@ export async function POST(
       return NextResponse.json({ error: 'المنتج غير موجود' }, { status: 404 });
     }
 
+    // 3. Extract File from Request
     const formData = await request.formData();
     const file = formData.get('file') as File;
     
@@ -29,22 +45,47 @@ export async function POST(
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save with the MatCode and Timestamp naming convention to allow multiple/future updates
-    const timestamp = Date.now();
-    const fileName = `${timestamp}.jpg`;
-    
-    // public/images/products directory path
-    const uploadDir = path.join(process.cwd(), 'public', 'images', 'products');
-    const filePath = path.join(uploadDir, fileName);
+    // 4. Upload to Cloudinary using upload_stream
+    const uploadResult = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'shopay/products',
+          public_id: `${product.matCode}_${Date.now()}`,
+          overwrite: true,
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    });
 
-    // Write file to public directory
-    await writeFile(filePath, buffer);
+    // 5. Delete Old Image from Cloudinary (if exists)
+    if (product.mainImageUrl && product.mainImageUrl.includes('cloudinary.com')) {
+      try {
+        // Extract public_id from Cloudinary URL
+        // Example URL: https://res.cloudinary.com/cloud_name/image/upload/v1234/shopay/products/code_123.jpg
+        const urlParts = product.mainImageUrl.split('/');
+        const folderIndex = urlParts.findIndex(part => part === 'shopay');
+        
+        if (folderIndex !== -1) {
+          const publicIdWithExt = urlParts.slice(folderIndex).join('/');
+          const publicId = publicIdWithExt.split('.')[0]; // remove extension
+          
+          await cloudinary.uploader.destroy(publicId);
+          console.log(`Deleted old image from Cloudinary: ${publicId}`);
+        }
+      } catch (delErr) {
+        console.error("Failed to delete old image from Cloudinary:", delErr);
+        // We don't throw here to ensure the update process finishes successfully.
+      }
+    }
 
-    // Update product database record
-    const imageUrl = `/images/products/${fileName}`;
+    // 6. Update Database
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: { mainImageUrl: imageUrl },
+      data: { mainImageUrl: uploadResult.secure_url },
     });
 
     return NextResponse.json({ 
