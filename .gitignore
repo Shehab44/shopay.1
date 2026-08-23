@@ -43,3 +43,10 @@ next-env.d.ts
 /src/generated/prisma
 
 .vercel
+
+# Database
+*.db
+*.db-journal
+
+# Dev tools
+/scripts/dev-tools/

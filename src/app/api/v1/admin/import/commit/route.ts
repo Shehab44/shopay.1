@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server';
-import { parse } from 'csv-parse/sync';
+import * as xlsx from 'xlsx';
 import prisma from '@/lib/db';
 
 const CATEGORY_MAP: Record<string, string> = {
-  '0101': 'أجهزة كهربائية وسخانات',
-  '0102': 'مستلزمات كهربائية',
-  '0103': 'أدوات منزلية ومطبخ',
-  '0104': 'مستلزمات منزلية ونظافة صحية',
-  '0105': 'أزياء وإكسسوارات رأس',
-  '0106': 'ألعاب أطفال',
-  '0107': 'مستحضرات تجميل وعناية',
-  '0108': 'إكسسوارات شعر',
-  '0109': 'مستلزمات أطفال',
-  '0110': 'أحذية',
-  '0111': 'طاقة وأجهزة إنفرتر',
-  '0112': 'عدة وأدوات ورشة',
-  '0113': 'أدوات تنظيف',
-  '0114': 'جلديات وأدوات رياضية',
+  '101': 'أجهزة كهربائية وسخانات',
+  '102': 'مستلزمات كهربائية',
+  '103': 'أدوات منزلية ومطبخ',
+  '104': 'مستلزمات منزلية ونظافة صحية',
+  '105': 'أزياء وإكسسوارات رأس',
+  '106': 'ألعاب أطفال',
+  '107': 'مستحضرات تجميل وعناية',
+  '108': 'إكسسوارات شعر',
+  '109': 'مستلزمات أطفال',
+  '110': 'أحذية',
+  '111': 'طاقة وأجهزة إنفرتر',
+  '112': 'عدة وأدوات ورشة',
+  '113': 'أدوات تنظيف',
+  '114': 'جلديات وأدوات رياضية',
 };
 
 export async function POST(request: Request) {
@@ -28,12 +28,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'لم يتم العثور على ملف' }, { status: 400 });
     }
 
-    const text = await file.text();
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    }) as Record<string, any>[];
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    let workbook;
+    try {
+      workbook = xlsx.read(buffer, { type: 'buffer' });
+    } catch (e) {
+      return NextResponse.json({ error: 'صيغة الملف غير مدعومة. يرجى رفع ملف Excel (xlsx).' }, { status: 400 });
+    }
+
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const records = xlsx.utils.sheet_to_json(worksheet) as Record<string, any>[];
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ' }, { status: 400 });
@@ -42,8 +49,12 @@ export async function POST(request: Request) {
     // Process Categories
     const categoryPrefixes = new Set<string>();
     for (const record of records) {
-      if (record.MatCode && record.MatCode.length >= 4) {
-        categoryPrefixes.add(record.MatCode.substring(0, 4));
+      const matCodeKey = Object.keys(record).find(k => k.trim() === 'الرمز');
+      if (matCodeKey) {
+        let matCode = record[matCodeKey]?.toString().trim();
+        if (matCode && matCode.length === 7) {
+          categoryPrefixes.add(matCode.substring(0, 3));
+        }
       }
     }
 
@@ -59,33 +70,45 @@ export async function POST(request: Request) {
     }
 
     // Process Products
+    let processed = 0;
     for (const record of records) {
-      const matCode = record.MatCode;
-      const prefix = matCode.substring(0, 4);
+      const matCodeKey = Object.keys(record).find(k => k.trim() === 'الرمز');
+      const nameKey = Object.keys(record).find(k => k.trim() === 'الاسم');
+      const priceKey = Object.keys(record).find(k => k.trim() === 'السعر الإفرادي');
+
+      if (!matCodeKey || !nameKey || !priceKey) continue;
+
+      const matCode = record[matCodeKey]?.toString().trim();
+      const productName = record[nameKey]?.toString().trim();
+      
+      if (!matCode || matCode.length !== 7) continue;
+
+      const prefix = matCode.substring(0, 3);
       const categoryId = categoryIdMap.get(prefix);
 
-      const price = parseFloat(record.Price) || 0;
+      const price = parseFloat(record[priceKey]) || 0;
       const isActive = price > 0; // Hide 0-price products
 
       await prisma.product.upsert({
         where: { matCode },
         update: { 
-          nameAr: record.ProductName, 
+          nameAr: productName, 
           categoryId,
           price,
           isActive
         },
         create: { 
           matCode, 
-          nameAr: record.ProductName, 
+          nameAr: productName, 
           categoryId,
           price,
           isActive
         },
       });
+      processed++;
     }
 
-    return NextResponse.json({ success: true, processed: records.length });
+    return NextResponse.json({ success: true, processed });
   } catch (error: any) {
     console.error('Commit error:', error);
     return NextResponse.json({ error: error.message || 'حدث خطأ أثناء حفظ التحديثات' }, { status: 500 });

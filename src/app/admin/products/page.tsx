@@ -1,3 +1,4 @@
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import Link from "next/link";
 import { Search, Edit } from "lucide-react";
@@ -76,7 +77,7 @@ export default async function AdminProductsPage({
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-sm">
                       <div>
-                        <span className="font-semibold text-shopay-purple">${product.price.toFixed(2)}</span>
+                        <span className="font-semibold text-shopay-purple">{CURRENCY_SYMBOL}{product.price.toFixed(2)}</span>
                       </div>
                     </div>
                   </td>
@@ -116,12 +117,12 @@ export default async function AdminProductsPage({
           </div>
           <div className="flex gap-2">
             {page > 1 && (
-              <Link href={`/admin/products?page=${page - 1}${q ? '&q='+q : ''}`} className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
+              <Link href={`/admin/products?page=${page - 1}${q ? '&q='+q : ''}`} aria-label="الصفحة السابقة" className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
                 السابق
               </Link>
             )}
             {page * limit < total && (
-              <Link href={`/admin/products?page=${page + 1}${q ? '&q='+q : ''}`} className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
+              <Link href={`/admin/products?page=${page + 1}${q ? '&q='+q : ''}`} aria-label="الصفحة التالية" className="px-3 py-1 border rounded hover:bg-shopay-gray-light">
                 التالي
               </Link>
             )}

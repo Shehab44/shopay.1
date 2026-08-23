@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { parse } from 'csv-parse/sync';
+import * as xlsx from 'xlsx';
 import prisma from '@/lib/db';
 
 export async function POST(request: Request) {
@@ -11,42 +11,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'لم يتم العثور على ملف' }, { status: 400 });
     }
 
-    const text = await file.text();
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    }) as Record<string, any>[];
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    let workbook;
+    try {
+      workbook = xlsx.read(buffer, { type: 'buffer' });
+    } catch (e) {
+      return NextResponse.json({ error: 'صيغة الملف غير مدعومة. يرجى رفع ملف Excel (xlsx).' }, { status: 400 });
+    }
+
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const records = xlsx.utils.sheet_to_json(worksheet) as Record<string, any>[];
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على بيانات صالحة' }, { status: 400 });
     }
 
     // Verify required columns
-    const firstRow = records[0] as Record<string, any>;
-    if (!firstRow.MatCode || !firstRow.ProductName || !firstRow.Price) {
+    const firstRow = records[0];
+    const expectedColumns = ['الرمز', 'الاسم', 'السعر الإفرادي'];
+    
+    // Check if the keys exist
+    const hasColumns = expectedColumns.every(col => Object.keys(firstRow).some(key => key.trim() === col));
+    
+    if (!hasColumns) {
       return NextResponse.json({ 
-        error: 'الملف ينقصه أعمدة أساسية. يجب أن يحتوي على MatCode, ProductName, Price' 
+        error: `الملف ينقصه أعمدة أساسية. الأعمدة المطلوبة: ${expectedColumns.join(', ')}` 
       }, { status: 400 });
     }
 
-    // Group by MatCode just to count unique products
-    const uniqueMatCodes = new Set(records.map((r: any) => r.MatCode));
-    
+    const errors: string[] = [];
+    const uniqueMatCodes = new Set<string>();
+
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      const matCodeKey = Object.keys(record).find(k => k.trim() === 'الرمز')!;
+      let matCode = record[matCodeKey];
+      if (matCode) {
+        matCode = matCode.toString().trim();
+        if (matCode.length !== 7) {
+          errors.push(`السطر ${i + 2}: الرمز "${matCode}" يجب أن يتكون من 7 خانات بالضبط.`);
+        } else {
+          uniqueMatCodes.add(matCode);
+        }
+      }
+    }
+
     // Fetch existing products to compare
     const existingProductsCount = await prisma.product.count({
-      where: { matCode: { in: Array.from(uniqueMatCodes) as string[] } }
+      where: { matCode: { in: Array.from(uniqueMatCodes) } }
     });
 
     const newProducts = uniqueMatCodes.size - existingProductsCount;
-    // In a real advanced preview, we'd compare prices exactly. For now, we estimate based on records length.
-    const updatedPrices = records.length; 
+    const updatedPrices = existingProductsCount > 0 ? records.length : 0; 
 
     return NextResponse.json({
       totalRows: records.length,
-      updatedPrices: existingProductsCount > 0 ? updatedPrices : 0, // Simplified for demo
-      newProducts: newProducts > 0 ? newProducts : 0,
-      errors: [],
+      updatedPrices,
+      newProducts,
+      errors: errors.slice(0, 5), // Return top 5 errors max for preview
     });
 
   } catch (error: any) {

@@ -38,10 +38,14 @@ export default async function Home() {
               تسوق الآن
             </Link>
           </div>
-          <div className="md:w-1/2 relative h-64 md:h-96 w-full">
-            {/* Placeholder for banner image */}
-            <div className="absolute inset-0 bg-shopay-white/10 rounded-2xl border border-shopay-white/20 flex items-center justify-center backdrop-blur-sm">
-              <span className="text-shopay-white/50 text-2xl font-bold">صورة عروض المتجر</span>
+          <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-2xl overflow-hidden shadow-2xl">
+            {/* Elegant Gradient Banner Placeholder */}
+            <div className="absolute inset-0 bg-gradient-to-br from-shopay-purple via-purple-900 to-shopay-black flex flex-col items-center justify-center p-6 text-center border border-shopay-white/10">
+              <div className="w-24 h-24 mb-6 rounded-full bg-shopay-white/10 flex items-center justify-center backdrop-blur-md">
+                <span className="text-5xl font-black text-shopay-white tracking-tighter">S</span>
+              </div>
+              <h3 className="text-2xl font-bold text-shopay-white mb-2">عروض حصرية</h3>
+              <p className="text-shopay-white/70">اكتشف أحدث التشكيلات بأفضل الأسعار</p>
             </div>
           </div>
         </div>
@@ -54,7 +58,7 @@ export default async function Home() {
       {/* Featured Products */}
       <section className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-shopay-black">الأكثر مبيعاً</h2>
+          <h2 className="text-2xl font-bold text-shopay-black">قد يعجبك</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {featuredProducts.map(product => (

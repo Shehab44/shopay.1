@@ -4,6 +4,8 @@ import { Package, Users, ShoppingBag, TrendingUp } from "lucide-react";
 export default async function AdminDashboard() {
   const productsCount = await prisma.product.count();
   const categoriesCount = await prisma.category.count();
+  const newOrdersCount = await prisma.order.count({ where: { status: 'pending' } });
+  const customersCount = await prisma.user.count({ where: { role: 'customer' } });
   
   return (
     <div>
@@ -36,7 +38,7 @@ export default async function AdminDashboard() {
           </div>
           <div>
             <div className="text-shopay-black/50 text-sm font-semibold mb-1">الطلبات الجديدة</div>
-            <div className="text-2xl font-bold text-shopay-black">0</div>
+            <div className="text-2xl font-bold text-shopay-black">{newOrdersCount}</div>
           </div>
         </div>
         
@@ -46,7 +48,7 @@ export default async function AdminDashboard() {
           </div>
           <div>
             <div className="text-shopay-black/50 text-sm font-semibold mb-1">العملاء</div>
-            <div className="text-2xl font-bold text-shopay-black">0</div>
+            <div className="text-2xl font-bold text-shopay-black">{customersCount}</div>
           </div>
         </div>
       </div>

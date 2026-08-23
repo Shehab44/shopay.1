@@ -1,4 +1,5 @@
 "use client";
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,7 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    city: "",
     address: "",
     notes: "",
   });
@@ -56,12 +58,13 @@ export default function CheckoutPage() {
         // Format message for WhatsApp
         let msg = `*طلب جديد من SHOPAY*%0A`;
         msg += `الاسم: ${formData.name}%0A`;
+        msg += `المدينة: ${formData.city}%0A`;
         msg += `العنوان: ${formData.address}%0A%0A`;
         msg += `*المنتجات:*%0A`;
         items.forEach(item => {
-          msg += `- ${item.nameAr} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}%0A`;
+          msg += `- ${item.nameAr} x ${item.quantity} = ${CURRENCY_SYMBOL}${(item.price * item.quantity).toFixed(2)}%0A`;
         });
-        msg += `%0A*الإجمالي: $${getTotalPrice().toFixed(2)}*`;
+        msg += `%0A*الإجمالي: ${CURRENCY_SYMBOL}${getTotalPrice().toFixed(2)}*`;
         
         window.open(`https://wa.me/96100000000?text=${msg}`, '_blank');
       }
@@ -145,16 +148,29 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-shopay-black text-sm font-bold mb-2">عنوان التوصيل بالتفصيل <span className="text-red-500">*</span></label>
-              <textarea 
-                required
-                rows={3}
-                value={formData.address}
-                onChange={e => setFormData({...formData, address: e.target.value})}
-                className="w-full bg-shopay-gray-light text-shopay-black px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-shopay-purple/50 border border-transparent focus:border-shopay-purple/30 transition-all"
-                placeholder="المدينة، المنطقة، الشارع، البناية، الطابق..."
-              ></textarea>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="md:col-span-1">
+                <label className="block text-shopay-black text-sm font-bold mb-2">المدينة / المحافظة <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  required
+                  value={formData.city}
+                  onChange={e => setFormData({...formData, city: e.target.value})}
+                  className="w-full bg-shopay-gray-light text-shopay-black px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-shopay-purple/50 border border-transparent focus:border-shopay-purple/30 transition-all"
+                  placeholder="مثال: بيروت"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-shopay-black text-sm font-bold mb-2">عنوان التوصيل بالتفصيل <span className="text-red-500">*</span></label>
+                <input 
+                  type="text"
+                  required
+                  value={formData.address}
+                  onChange={e => setFormData({...formData, address: e.target.value})}
+                  className="w-full bg-shopay-gray-light text-shopay-black px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-shopay-purple/50 border border-transparent focus:border-shopay-purple/30 transition-all"
+                  placeholder="المنطقة، الشارع، البناية، الطابق..."
+                />
+              </div>
             </div>
 
             <div className="mb-8">
@@ -172,7 +188,7 @@ export default function CheckoutPage() {
               <button 
                 type="button"
                 onClick={(e) => handleSubmit(e, false)}
-                disabled={loading || !formData.name || !formData.phone || !formData.address}
+                disabled={loading || !formData.name || !formData.phone || !formData.city || !formData.address}
                 className="flex-1 bg-shopay-black text-shopay-white h-14 rounded-xl font-bold hover:bg-shopay-black/80 transition-colors disabled:opacity-50"
               >
                 {loading ? "جاري الإرسال..." : "تأكيد الطلب"}
@@ -181,7 +197,7 @@ export default function CheckoutPage() {
               <button 
                 type="button"
                 onClick={(e) => handleSubmit(e, true)}
-                disabled={loading || !formData.name || !formData.phone || !formData.address}
+                disabled={loading || !formData.name || !formData.phone || !formData.city || !formData.address}
                 className="flex-1 bg-green-500 text-white h-14 rounded-xl font-bold hover:bg-green-600 transition-colors disabled:opacity-50"
               >
                 تأكيد عبر واتساب
@@ -205,7 +221,7 @@ export default function CheckoutPage() {
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-shopay-black truncate">{item.nameAr}</div>
                     <div className="text-xs text-shopay-black/60">قطعة x {item.quantity}</div>
-                    <div className="text-shopay-purple font-bold text-sm">${(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="text-shopay-purple font-bold text-sm">{CURRENCY_SYMBOL}{(item.price * item.quantity).toFixed(2)}</div>
                   </div>
                 </div>
               ))}
@@ -213,7 +229,7 @@ export default function CheckoutPage() {
             
             <div className="border-t border-shopay-black/10 pt-4 flex items-center justify-between">
               <span className="font-bold text-shopay-black">المجموع الكلي</span>
-              <span className="font-bold text-shopay-purple text-xl">${getTotalPrice().toFixed(2)}</span>
+              <span className="font-bold text-shopay-purple text-xl">{CURRENCY_SYMBOL}{getTotalPrice().toFixed(2)}</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Search, ShoppingCart, User, Heart, Menu } from 'lucide-react';
+import { ShoppingCart, User, Heart, Menu } from 'lucide-react';
 import CartIcon from './CartIcon';
+import SearchBar from './SearchBar';
 
 export default function Header() {
   return (
@@ -18,13 +19,8 @@ export default function Header() {
         </div>
 
         {/* Search Bar */}
-        <div className="hidden lg:flex flex-1 max-w-xl mx-8 relative">
-          <input 
-            type="text" 
-            placeholder="ابحث عن منتج، قسم، أو رمز المادة..." 
-            className="w-full bg-shopay-gray-light text-shopay-black px-4 py-2 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-shopay-purple/50"
-          />
-          <Search className="absolute right-3 top-2.5 w-5 h-5 text-shopay-black/50" />
+        <div className="hidden lg:block flex-1 max-w-xl mx-8">
+          <SearchBar />
         </div>
 
         {/* Icons */}
@@ -42,14 +38,7 @@ export default function Header() {
       
       {/* Mobile Search */}
       <div className="lg:hidden px-4 pb-3">
-        <div className="relative">
-          <input 
-            type="text" 
-            placeholder="ابحث..." 
-            className="w-full bg-shopay-gray-light text-shopay-black px-4 py-2 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-shopay-purple/50"
-          />
-          <Search className="absolute right-3 top-2.5 w-5 h-5 text-shopay-black/50" />
-        </div>
+        <SearchBar />
       </div>
     </header>
   );

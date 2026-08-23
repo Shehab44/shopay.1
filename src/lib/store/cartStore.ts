@@ -26,6 +26,10 @@ export const useCartStore = create<CartState>()(
       items: [],
       
       addItem: (newItem) => {
+        if (newItem.price <= 0) {
+          alert("لا يمكن إضافة هذا المنتج للسلة لأن سعره غير محدد.");
+          return;
+        }
         set((state) => {
           const existingItem = state.items.find((item) => item.productId === newItem.productId);
           if (existingItem) {
