@@ -1,32 +1,7 @@
-'use server';
 
-import prisma from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { revalidatePath } from 'next/cache';
-
-export async function getMoreProducts(q: string, noImage: boolean, skip: number, take: number = 30) {
-  const where: any = {};
-  if (q) {
-    where.OR = [
-      { nameAr: { contains: q } },
-      { matCode: { contains: q } },
-    ];
-  }
-  if (noImage) {
-    where.mainImageUrl = null;
-  }
-  
-  const products = await prisma.product.findMany({
-    where,
-    include: { category: true },
-    skip,
-    take,
-    orderBy: { id: 'desc' },
-  });
-  
-  return products;
-}
 
 export async function updateProduct(id: number, data: any) {
   const session = await getServerSession(authOptions);

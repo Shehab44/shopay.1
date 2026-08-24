@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Edit } from "lucide-react";
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 import ProductImageUpload from "./ProductImageUpload";
@@ -95,9 +96,9 @@ export default function ProductListClient({
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <button className="text-shopay-black/50 hover:text-shopay-purple">
+                  <Link href={`/admin/products/${product.id}/edit`} className="text-shopay-black/50 hover:text-shopay-purple inline-block">
                     <Edit className="w-5 h-5" />
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))}
