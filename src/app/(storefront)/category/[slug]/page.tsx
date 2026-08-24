@@ -14,14 +14,20 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
+  const isAll = slug === 'all';
+  let category = null;
   
-  const category = await prisma.category.findUnique({
-    where: { codePrefix: slug }
-  });
+  if (!isAll) {
+    category = await prisma.category.findUnique({
+      where: { codePrefix: slug }
+    });
 
-  if (!category) {
-    notFound();
+    if (!category) {
+      notFound();
+    }
   }
+
+  const categoryName = isAll ? 'الكل' : category?.nameAr;
 
   // Filters logic
   const minPrice = resolvedSearchParams.min ? parseFloat(resolvedSearchParams.min as string) : undefined;
@@ -29,9 +35,12 @@ export default async function CategoryPage({
   const sort = resolvedSearchParams.sort as string || "newest";
 
   const whereClause: any = { 
-    categoryId: category.id, 
     isActive: true 
   };
+  
+  if (!isAll && category) {
+    whereClause.categoryId = category.id;
+  }
 
   if (minPrice !== undefined || maxPrice !== undefined) {
     whereClause.price = {};
@@ -68,7 +77,7 @@ export default async function CategoryPage({
       <div className="text-sm text-shopay-black/50 mb-6 flex items-center gap-2">
         <span>الرئيسية</span>
         <span>/</span>
-        <span className="text-shopay-black font-semibold">{category.nameAr}</span>
+        <span className="text-shopay-black font-semibold">{categoryName}</span>
       </div>
       
       <div className="flex flex-col md:flex-row gap-8">
@@ -81,7 +90,7 @@ export default async function CategoryPage({
         {/* Main Content */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-shopay-black">{category.nameAr}</h1>
+            <h1 className="text-3xl font-bold text-shopay-black">{categoryName}</h1>
             <span className="text-shopay-black/50 text-sm">
               {totalProducts > 0 ? `إجمالي المنتجات: ${totalProducts}` : '0 منتجات'}
             </span>
