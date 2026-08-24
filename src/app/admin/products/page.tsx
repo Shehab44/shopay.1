@@ -85,7 +85,3 @@ export default async function AdminProductsPage({
     </div>
   );
 }
-      </div>
-    </div>
-  );
-}

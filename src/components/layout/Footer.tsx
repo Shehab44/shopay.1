@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand Info */}
           <div>
             <div className="mb-4">
-              <span className="text-3xl font-bold text-shopay-gradient bg-shopay-white px-2 rounded font-sans">SHOPAY</span>
+              <span className="text-3xl font-bold text-shopay-gradient bg-shopay-white px-2 rounded font-sans" dir="ltr">SHOPAY</span>
             </div>
             <p className="text-shopay-gray-light/80 text-sm leading-relaxed mb-6">
               بوابتك للتسوق الموثوق. خيارك الأول لشراء المنتجات بأسعار المفرق والجملة بأفضل جودة وأسرع توصيل.

@@ -14,7 +14,7 @@ export default function Header() {
             <Menu className="w-6 h-6" />
           </button>
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-shopay-gradient tracking-wide font-sans">SHOPAY</span>
+            <span className="text-2xl font-bold text-shopay-gradient tracking-wide font-sans" dir="ltr">SHOPAY</span>
           </Link>
         </div>
 
