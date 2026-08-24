@@ -38,15 +38,18 @@ export default async function AdminProductsPage({
 
       <div className="bg-shopay-white rounded-2xl border border-shopay-gray-light shadow-sm overflow-hidden">
         <div className="p-4 border-b border-shopay-gray-light flex items-center gap-4">
-          <div className="relative flex-1 max-w-md">
+          <form className="relative flex-1 max-w-md" method="GET" action="/admin/products">
             <input 
               type="text" 
+              name="q"
               placeholder="ابحث برمز المادة أو اسم المنتج..." 
               defaultValue={q}
               className="w-full bg-shopay-gray-light text-shopay-black px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-shopay-purple/50"
             />
-            <Search className="absolute right-3 top-2.5 w-5 h-5 text-shopay-black/50" />
-          </div>
+            <button type="submit" className="absolute right-3 top-2.5 text-shopay-black/50 hover:text-shopay-purple">
+              <Search className="w-5 h-5" />
+            </button>
+          </form>
         </div>
         
         <div className="overflow-x-auto">
