@@ -1,8 +1,9 @@
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import Link from "next/link";
-import { Search, Edit } from "lucide-react";
+import { Search } from "lucide-react";
 import ProductListClient from "./ProductListClient";
+import NoImageFilter from "./NoImageFilter";
 
 export default async function AdminProductsPage({
   searchParams,
@@ -57,20 +58,7 @@ export default async function AdminProductsPage({
             </button>
           </form>
           <div className="flex items-center gap-2">
-            <form method="GET" action="/admin/products">
-              {q && <input type="hidden" name="q" value={q} />}
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-shopay-black/80 font-medium">
-                <input 
-                  type="checkbox" 
-                  name="noImage" 
-                  value="true" 
-                  defaultChecked={noImage}
-                  onChange={(e) => e.target.form?.submit()}
-                  className="rounded text-shopay-purple focus:ring-shopay-purple"
-                />
-                عرض المنتجات بدون صورة فقط
-              </label>
-            </form>
+            <NoImageFilter q={q} noImage={noImage} />
           </div>
         </div>
         
