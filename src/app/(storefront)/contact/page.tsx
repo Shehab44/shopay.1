@@ -1,4 +1,4 @@
-﻿import { Phone, Mail, Clock, MessageCircle } from "lucide-react";
+import { Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import ContactForm from "@/components/contact/ContactForm";
 import type { Metadata } from "next";
 
@@ -8,6 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+  const message = encodeURIComponent("مرحباً، لدي استفسار بخصوص متجر Shopay.");
+  const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${message}` : null;
+
   return (
     <div className="bg-shopay-gray-light/10 min-h-screen py-12 md:py-20">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -32,8 +36,8 @@ export default function ContactPage() {
                 <Phone className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-shopay-black mb-1">رقم الهاتف</h3>
-                <p className="text-shopay-black/70" dir="ltr">+961 00 000 000</p>
+                <h3 className="text-lg font-bold text-shopay-black mb-1">خدمة العملاء</h3>
+                <p className="text-shopay-black/70">متاح للمراسلة عبر واتساب</p>
               </div>
             </div>
 
@@ -59,15 +63,17 @@ export default function ContactPage() {
             </div>
 
             {/* WhatsApp CTA */}
-            <a 
-              href="https://wa.me/96100000000" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="mt-8 flex items-center justify-center gap-3 w-full bg-[#25D366] hover:bg-[#128C7E] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-sm"
-            >
-              <MessageCircle className="w-6 h-6" />
-              تحدث معنا عبر واتساب الآن
-            </a>
+            {whatsappLink && (
+              <a 
+                href={whatsappLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="mt-8 flex items-center justify-center gap-3 w-full bg-[#25D366] hover:bg-[#128C7E] text-white py-4 px-6 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-sm"
+              >
+                <MessageCircle className="w-6 h-6" />
+                تحدث معنا عبر واتساب الآن
+              </a>
+            )}
           </div>
 
           {/* Contact Form Side */}
