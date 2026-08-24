@@ -23,6 +23,13 @@ export default function ProductListClient({
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Reset state when search parameters change (q or noImage)
+  useEffect(() => {
+    setProducts(initialProducts);
+    setPage(1);
+    setHasMore(initialProducts.length === 30);
+  }, [initialProducts, q, noImage]);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const target = entries[0];
@@ -48,7 +55,10 @@ export default function ProductListClient({
       if (newProducts.length === 0) {
         setHasMore(false);
       } else {
-        setProducts(prev => [...prev, ...newProducts]);
+        setProducts(prev => {
+          const uniqueNewProducts = newProducts.filter(np => !prev.some(p => p.id === np.id));
+          return [...prev, ...uniqueNewProducts];
+        });
         setPage(nextPage);
         if (newProducts.length < 30) setHasMore(false);
       }
