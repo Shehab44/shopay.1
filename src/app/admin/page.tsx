@@ -76,8 +76,8 @@ export default async function AdminDashboard() {
                 {latestOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-shopay-gray-light/30 text-sm">
                     <td className="px-4 py-3 font-mono text-shopay-black/70">#{order.id}</td>
-                    <td className="px-4 py-3 text-shopay-black">{order.user.name || order.user.email}</td>
-                    <td className="px-4 py-3 font-semibold text-shopay-purple">${order.totalAmount.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-shopay-black">{order.user ? (order.user.fullName || order.user.email) : 'مجهول'}</td>
+                    <td className="px-4 py-3 font-semibold text-shopay-purple">${order.total ? order.total.toFixed(2) : '0.00'}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded text-xs font-bold ${
                         order.status === 'pending' ? 'bg-orange-100 text-orange-700' :

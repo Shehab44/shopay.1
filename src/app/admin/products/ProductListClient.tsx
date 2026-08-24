@@ -21,10 +21,12 @@ export default function ProductListClient({
   const [hasMore, setHasMore] = useState(initialProducts.length === 30);
   const loaderRef = useRef<HTMLDivElement>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const target = entries[0];
-      if (target.isIntersecting && hasMore) {
+      if (target.isIntersecting && hasMore && !isLoading) {
         loadMore();
       }
     }, { threshold: 0.1 });
@@ -34,18 +36,24 @@ export default function ProductListClient({
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [hasMore, page]); // Re-bind observer when state changes
+  }, [hasMore, page, isLoading]); // Re-bind observer when state changes
 
   const loadMore = async () => {
-    const nextPage = page + 1;
-    const newProducts = await getMoreProducts(q, noImage, (nextPage - 1) * 30, 30);
-    
-    if (newProducts.length === 0) {
-      setHasMore(false);
-    } else {
-      setProducts(prev => [...prev, ...newProducts]);
-      setPage(nextPage);
-      if (newProducts.length < 30) setHasMore(false);
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const nextPage = page + 1;
+      const newProducts = await getMoreProducts(q, noImage, (nextPage - 1) * 30, 30);
+      
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      } else {
+        setProducts(prev => [...prev, ...newProducts]);
+        setPage(nextPage);
+        if (newProducts.length < 30) setHasMore(false);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
