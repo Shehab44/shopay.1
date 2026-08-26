@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
+import { loginCache, checkRateLimit, resetRateLimit } from "@/lib/rateLimit";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,9 +12,17 @@ export const authOptions: NextAuthOptions = {
         phone: { label: "رقم الهاتف", type: "text" },
         password: { label: "كلمة المرور", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.phone || !credentials?.password) {
           throw new Error("يرجى إدخال رقم الهاتف وكلمة المرور");
+        }
+
+        const ip = req?.headers?.['x-forwarded-for'] || 'unknown-ip';
+        const rateLimitKey = `${ip}_${credentials.phone}`;
+
+        const { success } = checkRateLimit(loginCache, rateLimitKey, 5);
+        if (!success) {
+          throw new Error("تجاوزت الحد الأقصى لمحاولات الدخول الخاطئة. يرجى الانتظار لمدة 15 دقيقة.");
         }
 
         const user = await prisma.user.findUnique({
@@ -33,6 +42,9 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           throw new Error("رقم الهاتف أو كلمة المرور غير صحيحة");
         }
+
+        // Reset the rate limit on successful login
+        resetRateLimit(loginCache, rateLimitKey);
 
         return {
           id: user.id.toString(),

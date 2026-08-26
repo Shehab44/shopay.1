@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import bcrypt from 'bcrypt';
+import { otpCache, checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'رقم الهاتف مطلوب' }, { status: 400 });
     }
 
+    // Get IP for rate limiting
+    const ip = request.headers.get('x-forwarded-for') || 'unknown-ip';
+    const rateLimitKey = `${ip}_${phone}`;
+
     if (action === 'request_otp') {
+      const { success } = checkRateLimit(otpCache, rateLimitKey, 3);
+      if (!success) {
+        return NextResponse.json({ error: 'لقد تجاوزت الحد الأقصى لطلب الرمز. يرجى المحاولة بعد 15 دقيقة.' }, { status: 429 });
+      }
+
       const existingUser = await prisma.user.findUnique({ where: { phone } });
 
       if (existingUser && existingUser.passwordHash !== 'GUEST_NO_LOGIN') {
