@@ -23,6 +23,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'رقم طلب غير صالح' }, { status: 400 });
     }
 
+    /* 
+     * ⚠️ تحذير أمني مستقبلي (IDOR Prevention):
+     * هذا المسار آمن حالياً لأنه محمي بصلاحيات الإدارة (requireAdmin).
+     * عند بناء مسار مماثل للعميل مستقبلاً (Customer API)، يجب التحقق أن:
+     * order.userId === session.user.id
+     * لمنع المهاجمين من تعديل أو قراءة طلبات لا تخصهم (Insecure Direct Object Reference).
+     */
+
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status },
