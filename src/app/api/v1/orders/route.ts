@@ -33,20 +33,46 @@ export async function POST(request: Request) {
       }
     });
 
-    // Create Order with Items
+    // --- SECURITY FIX: SERVER-SIDE PRICE VALIDATION ---
+    // Extract unique product IDs requested by the client
+    const productIds = Array.from(new Set(items.map((item: any) => item.productId))) as number[];
+    
+    // Fetch real product data from the database
+    const dbProducts = await prisma.product.findMany({
+      where: { id: { in: productIds } }
+    });
+
+    // Check if all requested products actually exist
+    if (dbProducts.length !== productIds.length) {
+      return NextResponse.json({ error: 'عذراً، أحد المنتجات المطلوبة غير متوفر أو غير صالح' }, { status: 400 });
+    }
+
+    // Calculate real total and map items using database prices
+    let realTotalAmount = 0;
+    const validatedItems = items.map((item: any) => {
+      const dbProduct = dbProducts.find((p) => p.id === item.productId);
+      const realPrice = dbProduct!.price;
+      
+      realTotalAmount += realPrice * item.quantity;
+
+      return {
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPriceAtOrder: realPrice // Force real price from DB
+      };
+    });
+    // --------------------------------------------------
+
+    // Create Order with Validated Items
     const order = await prisma.order.create({
       data: {
         userId: user.id,
         addressId: savedAddress.id,
-        total: totalAmount,
+        total: realTotalAmount,
         status: 'pending',
         notes: notes || null,
         items: {
-          create: items.map((item: any) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPriceAtOrder: item.price
-          }))
+          create: validatedItems
         }
       },
       include: {
