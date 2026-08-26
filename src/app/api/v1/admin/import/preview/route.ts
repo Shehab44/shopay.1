@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import * as xlsx from 'xlsx';
+import ExcelJS from 'exceljs';
 import prisma from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 
@@ -18,16 +18,40 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
-    let workbook;
+    const workbook = new ExcelJS.Workbook();
     try {
-      workbook = xlsx.read(buffer, { type: 'buffer' });
+      await workbook.xlsx.load(buffer);
     } catch (e) {
       return NextResponse.json({ error: 'صيغة الملف غير مدعومة. يرجى رفع ملف Excel (xlsx).' }, { status: 400 });
     }
 
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const records = xlsx.utils.sheet_to_json(worksheet) as Record<string, any>[];
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) {
+      return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على صفحات' }, { status: 400 });
+    }
+
+    const records: Record<string, any>[] = [];
+    let headers: string[] = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell, colNumber) => {
+          headers[colNumber] = cell.value?.toString().trim() || `Column${colNumber}`;
+        });
+      } else {
+        const record: Record<string, any> = {};
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          const header = headers[colNumber];
+          if (header) {
+            record[header] = cell.value;
+          }
+        });
+        // Only push if it has some data
+        if (Object.keys(record).length > 0) {
+            records.push(record);
+        }
+      }
+    });
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على بيانات صالحة' }, { status: 400 });
