@@ -95,6 +95,14 @@ export async function POST(
     
   } catch (error: any) {
     console.error('Upload image error:', error);
-    return NextResponse.json({ error: error.message || 'حدث خطأ أثناء رفع الصورة' }, { status: 500 });
+
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'حدث خطأ أثناء رفع الصورة. يرجى المحاولة لاحقاً أو الاتصال بالدعم.' }, { status: 500 });
+    }
+
+    return NextResponse.json({ 
+      error: error.message || 'حدث خطأ أثناء رفع الصورة',
+      stack: error.stack 
+    }, { status: 500 });
   }
 }
