@@ -10,6 +10,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'بيانات الطلب غير مكتملة' }, { status: 400 });
     }
 
+    // --- SECURITY FIX: QUANTITY VALIDATION ---
+    for (const item of items) {
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+        return NextResponse.json({ error: 'كمية المنتج غير صالحة، يجب أن تكون رقماً صحيحاً أكبر من صفر.' }, { status: 400 });
+      }
+    }
+    // -----------------------------------------
+
     // Upsert a guest user or find existing by phone
     // In a real app we'd have proper auth, but since we are keeping it simple:
     let user = await prisma.user.findFirst({ where: { phone } });
