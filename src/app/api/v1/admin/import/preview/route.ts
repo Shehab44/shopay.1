@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import * as xlsx from 'xlsx';
 import prisma from '@/lib/db';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function POST(request: Request) {
   try {
+    const authError = await requireAdmin();
+    if (authError) return authError;
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     
