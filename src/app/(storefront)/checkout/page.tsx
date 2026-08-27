@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/store/cartStore";
 import ProductImage from "@/components/ui/ProductImage";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -26,7 +26,10 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (items.length === 0) {
+      router.push("/cart");
+    }
+  }, [items.length, router]);
 
   const handleSubmit = async (e: React.FormEvent, viaWhatsapp: boolean = false) => {
     e.preventDefault();
@@ -101,8 +104,12 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0) {
-    router.push("/cart");
-    return null;
+    return (
+      <div className="container mx-auto px-4 py-32 flex flex-col items-center justify-center text-center">
+        <Loader2 className="w-12 h-12 text-shopay-purple animate-spin mb-4" />
+        <p className="text-lg font-bold text-shopay-black/70">جاري التحويل للسلة...</p>
+      </div>
+    );
   }
 
   return (
