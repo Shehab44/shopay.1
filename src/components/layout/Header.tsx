@@ -1,18 +1,21 @@
 import Link from 'next/link';
-import { ShoppingCart, User, Heart, Menu } from 'lucide-react';
+import { ShoppingCart, User, Heart } from 'lucide-react';
+import MobileMenu from './MobileMenu';
+import prisma from '@/lib/db';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
 
-export default function Header() {
+export default async function Header() {
+  const categories = await prisma.category.findMany({
+    orderBy: { displayOrder: 'asc' }
+  });
   return (
     <header className="sticky top-0 z-40 w-full bg-shopay-white border-b border-shopay-gray-light shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         
         {/* Logo and Mobile Menu */}
         <div className="flex items-center gap-4">
-          <button className="lg:hidden text-shopay-black">
-            <Menu className="w-6 h-6" />
-          </button>
+          <MobileMenu categories={categories} />
           <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl font-bold text-shopay-gradient tracking-wide font-sans" dir="ltr">SHOPAY</span>
           </Link>
