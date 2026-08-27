@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     
     const workbook = new ExcelJS.Workbook();
     try {
-      await workbook.xlsx.load(buffer);
+      await workbook.xlsx.load(buffer as any);
     } catch (e) {
       return NextResponse.json({ error: 'صيغة الملف غير مدعومة. يرجى رفع ملف Excel (xlsx).' }, { status: 400 });
     }
