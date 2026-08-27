@@ -66,7 +66,8 @@ export default function CheckoutPage() {
         });
         msg += `%0A*الإجمالي: ${CURRENCY_SYMBOL}${getTotalPrice().toFixed(2)}*`;
         
-        window.open(`https://wa.me/96100000000?text=${msg}`, '_blank');
+        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '';
+        window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, '_blank');
       }
 
       setSuccess(true);
