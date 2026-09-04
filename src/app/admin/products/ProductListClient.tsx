@@ -2,19 +2,126 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Edit } from "lucide-react";
+import { Edit, Check, AlertCircle } from "lucide-react";
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 import ProductImageUpload from "./ProductImageUpload";
 import { getMoreProducts } from "./actions";
 
+interface Category {
+  id: number;
+  codePrefix: string;
+  nameAr: string;
+}
+
+function InlineCategoryEditor({
+  product,
+  categories,
+  onUpdated,
+}: {
+  product: any;
+  categories: Category[];
+  onUpdated: (updatedProduct: any) => void;
+}) {
+  const [selectedCatId, setSelectedCatId] = useState<string>(
+    product.categoryId ? product.categoryId.toString() : ""
+  );
+  const [subCategory, setSubCategory] = useState<string>(
+    product.subCategoryLabel || ""
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "error">("idle");
+
+  const currentCatId = product.categoryId ? product.categoryId.toString() : "";
+  const currentSubCat = product.subCategoryLabel || "";
+  const hasChanges = selectedCatId !== currentCatId || subCategory !== currentSubCat;
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveStatus("idle");
+    try {
+      const res = await fetch(`/api/v1/admin/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categoryId: selectedCatId ? parseInt(selectedCatId) : null,
+          subCategoryLabel: subCategory.trim() ? subCategory.trim() : null,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "فشل التحديث");
+      }
+
+      const data = await res.json();
+      onUpdated(data.product);
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    } catch (e: any) {
+      console.error("Save product category error:", e);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5 min-w-[200px] max-w-[240px]">
+      <select
+        value={selectedCatId}
+        onChange={(e) => setSelectedCatId(e.target.value)}
+        className="text-xs bg-shopay-gray-light border border-shopay-gray-light text-shopay-black rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-shopay-purple"
+      >
+        <option value="">-- بدون قسم --</option>
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>
+            [{c.codePrefix}] {c.nameAr}
+          </option>
+        ))}
+      </select>
+
+      <div className="flex items-center gap-1.5">
+        <input
+          type="text"
+          value={subCategory}
+          onChange={(e) => setSubCategory(e.target.value)}
+          placeholder="التفرع (اختياري)..."
+          className="text-xs bg-shopay-gray-light border border-shopay-gray-light text-shopay-black rounded px-2 py-1 flex-1 focus:outline-none focus:ring-1 focus:ring-shopay-purple"
+        />
+        <button
+          onClick={handleSave}
+          disabled={isSaving || !hasChanges}
+          className={`text-xs px-2.5 py-1 rounded font-semibold transition cursor-pointer flex items-center justify-center min-w-[48px] ${
+            saveStatus === "saved"
+              ? "bg-green-600 text-white"
+              : saveStatus === "error"
+              ? "bg-red-600 text-white"
+              : hasChanges
+              ? "bg-shopay-purple text-white hover:bg-shopay-purple/90"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          }`}
+          title="حفظ القسم والتفرع"
+        >
+          {isSaving ? "..." : saveStatus === "saved" ? "تم ✓" : saveStatus === "error" ? "خطأ" : "حفظ"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductListClient({ 
   initialProducts, 
+  categories = [],
   q, 
-  noImage 
+  noImage,
+  selectedCategoryId
 }: { 
-  initialProducts: any[], 
-  q: string, 
-  noImage: boolean 
+  initialProducts: any[];
+  categories?: Category[];
+  q: string;
+  noImage: boolean;
+  selectedCategoryId?: number | null;
 }) {
   const [products, setProducts] = useState(initialProducts);
   const [page, setPage] = useState(1);
@@ -23,12 +130,12 @@ export default function ProductListClient({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Reset state when search parameters change (q or noImage)
+  // Reset state when search parameters change
   useEffect(() => {
     setProducts(initialProducts);
     setPage(1);
     setHasMore(initialProducts.length === 30);
-  }, [initialProducts, q, noImage]);
+  }, [initialProducts, q, noImage, selectedCategoryId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -43,14 +150,20 @@ export default function ProductListClient({
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [hasMore, page, isLoading]); // Re-bind observer when state changes
+  }, [hasMore, page, isLoading]);
 
   const loadMore = async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
       const nextPage = page + 1;
-      const newProducts = await getMoreProducts(q, noImage, (nextPage - 1) * 30, 30);
+      const newProducts = await getMoreProducts(
+        q, 
+        noImage, 
+        (nextPage - 1) * 30, 
+        30,
+        selectedCategoryId
+      );
       
       if (newProducts.length === 0) {
         setHasMore(false);
@@ -67,6 +180,12 @@ export default function ProductListClient({
     }
   };
 
+  const handleProductUpdated = (updatedProduct: any) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p))
+    );
+  };
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -75,8 +194,8 @@ export default function ProductListClient({
             <tr>
               <th className="px-6 py-3 font-semibold">المنتج</th>
               <th className="px-6 py-3 font-semibold">رمز المادة</th>
-              <th className="px-6 py-3 font-semibold">القسم</th>
-              <th className="px-6 py-3 font-semibold">الوحدات والأسعار</th>
+              <th className="px-6 py-3 font-semibold">القسم والتفرع (تعديل مباشر)</th>
+              <th className="px-6 py-3 font-semibold">السعر</th>
               <th className="px-6 py-3 font-semibold">الصورة</th>
               <th className="px-6 py-3 font-semibold">الحالة</th>
               <th className="px-6 py-3 font-semibold">إجراءات</th>
@@ -85,14 +204,18 @@ export default function ProductListClient({
           <tbody className="divide-y divide-shopay-gray-light">
             {products.map(product => (
               <tr key={product.id} className="hover:bg-shopay-gray-light/30">
-                <td className="px-6 py-4 font-semibold text-shopay-black">
+                <td className="px-6 py-4 font-semibold text-shopay-black max-w-[280px]">
                   {product.nameAr}
                 </td>
                 <td className="px-6 py-4 text-shopay-black/70 font-mono text-sm">
                   {product.matCode}
                 </td>
-                <td className="px-6 py-4 text-shopay-black/70">
-                  {product.category?.nameAr}
+                <td className="px-6 py-4">
+                  <InlineCategoryEditor 
+                    product={product}
+                    categories={categories}
+                    onUpdated={handleProductUpdated}
+                  />
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1 text-sm">

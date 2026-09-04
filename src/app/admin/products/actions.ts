@@ -5,7 +5,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { revalidatePath } from 'next/cache';
 
-export async function getMoreProducts(q: string, noImage: boolean, skip: number, take: number = 30) {
+export async function getMoreProducts(
+  q: string,
+  noImage: boolean,
+  skip: number,
+  take: number = 30,
+  categoryId?: number | null
+) {
   const where: any = {};
   if (q) {
     where.OR = [
@@ -15,6 +21,9 @@ export async function getMoreProducts(q: string, noImage: boolean, skip: number,
   }
   if (noImage) {
     where.mainImageUrl = null;
+  }
+  if (categoryId) {
+    where.categoryId = categoryId;
   }
   
   const products = await prisma.product.findMany({
@@ -34,13 +43,17 @@ export async function updateProduct(id: number, data: any) {
     throw new Error('Unauthorized');
   }
 
+  const updateData: any = {};
+  if (data.nameAr !== undefined) updateData.nameAr = data.nameAr;
+  if (data.price !== undefined) updateData.price = parseFloat(data.price);
+  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId ? parseInt(data.categoryId) : null;
+  if (data.subCategoryLabel !== undefined) updateData.subCategoryLabel = data.subCategoryLabel ? data.subCategoryLabel.trim() : null;
+
   const updated = await prisma.product.update({
     where: { id },
-    data: {
-      nameAr: data.nameAr,
-      price: parseFloat(data.price),
-      isActive: data.isActive,
-    }
+    data: updateData,
+    include: { category: true }
   });
 
   revalidatePath('/admin/products');
