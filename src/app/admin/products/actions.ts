@@ -1,8 +1,8 @@
 'use server';
 
 import prisma from '@/lib/db';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { requireAdmin } from '@/lib/auth-guard';
+import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
 export async function getMoreProducts(
@@ -12,6 +12,11 @@ export async function getMoreProducts(
   take: number = 30,
   categoryId?: number | null
 ) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) {
+    throw new Error('Unauthorized: Admin access required');
+  }
+
   const where: any = {};
   if (q) {
     where.OR = [
@@ -38,9 +43,9 @@ export async function getMoreProducts(
 }
 
 export async function updateProduct(id: number, data: any) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as any).role !== 'admin') {
-    throw new Error('Unauthorized');
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) {
+    throw new Error('Unauthorized: Admin access required');
   }
 
   const updateData: any = {};
@@ -59,3 +64,4 @@ export async function updateProduct(id: number, data: any) {
   revalidatePath('/admin/products');
   return updated;
 }
+
