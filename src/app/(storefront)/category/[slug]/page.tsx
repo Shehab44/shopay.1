@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/db";
 import ProductCard from "@/components/product/ProductCard";
 import CategoryFilters from "@/components/category/CategoryFilters";
+import SubCategoryChips from "@/components/category/SubCategoryChips";
 import Link from "next/link";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
@@ -29,6 +30,32 @@ export default async function CategoryPage({
 
   const categoryName = isAll ? 'الكل' : category?.nameAr;
 
+  // استخراج معامل التفرع (subCategory)
+  const subCategory = typeof resolvedSearchParams.subCategory === 'string' && resolvedSearchParams.subCategory.trim() !== ''
+    ? resolvedSearchParams.subCategory.trim()
+    : undefined;
+
+  // جلب التفرعات المتاحة فعلياً داخل هذا القسم فقط (التي تمتلك منتجات نشطة)
+  let subCategories: string[] = [];
+  if (!isAll && category) {
+    const distinctSubCategories = await prisma.product.findMany({
+      where: {
+        categoryId: category.id,
+        subCategoryLabel: { not: null },
+        isActive: true,
+      },
+      select: {
+        subCategoryLabel: true,
+      },
+      distinct: ['subCategoryLabel'],
+    });
+
+    subCategories = distinctSubCategories
+      .map((p) => p.subCategoryLabel!)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, 'ar'));
+  }
+
   // Filters logic
   const minPrice = resolvedSearchParams.min ? parseFloat(resolvedSearchParams.min as string) : undefined;
   const maxPrice = resolvedSearchParams.max ? parseFloat(resolvedSearchParams.max as string) : undefined;
@@ -40,6 +67,11 @@ export default async function CategoryPage({
   
   if (!isAll && category) {
     whereClause.categoryId = category.id;
+  }
+
+  // تطبيق فلترة التفرع على السيرفر إذا وُجد
+  if (subCategory && subCategory !== 'all') {
+    whereClause.subCategoryLabel = subCategory;
   }
 
   if (minPrice !== undefined || maxPrice !== undefined) {
@@ -71,6 +103,8 @@ export default async function CategoryPage({
     orderBy
   });
 
+  const subCategoryParam = subCategory ? `&subCategory=${encodeURIComponent(subCategory)}` : '';
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
@@ -96,6 +130,16 @@ export default async function CategoryPage({
             </span>
           </div>
 
+          {/* Subcategory Chips */}
+          {!isAll && (
+            <div className="mb-6">
+              <SubCategoryChips
+                subCategories={subCategories}
+                activeSubCategory={subCategory}
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {products.map(product => (
               <ProductCard key={product.id} product={product as any} />
@@ -112,7 +156,7 @@ export default async function CategoryPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-12">
               <Link 
-                href={`/category/${slug}?page=${Math.max(1, currentPage - 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}`}
+                href={`/category/${slug}?page=${Math.max(1, currentPage - 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}${subCategoryParam}`}
                 className={`w-10 h-10 flex items-center justify-center rounded-full border border-shopay-gray-light hover:border-shopay-purple transition-colors ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
                 aria-label="الصفحة السابقة"
               >
@@ -126,7 +170,7 @@ export default async function CategoryPage({
               </div>
 
               <Link 
-                href={`/category/${slug}?page=${Math.min(totalPages, currentPage + 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}`}
+                href={`/category/${slug}?page=${Math.min(totalPages, currentPage + 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}${subCategoryParam}`}
                 className={`w-10 h-10 flex items-center justify-center rounded-full border border-shopay-gray-light hover:border-shopay-purple transition-colors ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
                 aria-label="الصفحة التالية"
               >
@@ -140,3 +184,4 @@ export default async function CategoryPage({
     </div>
   );
 }
+
