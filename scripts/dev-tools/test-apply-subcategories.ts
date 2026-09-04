@@ -91,7 +91,8 @@ async function testApplySubcategories() {
       prisma.product.update({ where: { id: p1.id }, data: { subCategoryLabel: label1 } }),
       prisma.product.update({ where: { id: p2.id }, data: { subCategoryLabel: label2 } }),
       prisma.product.update({ where: { id: p3.id }, data: { subCategoryLabel: label3 } }),
-    ], { maxWait: 10000, timeout: 60000 });
+    ], { maxWait: 10000, timeout: 60000 } as any);
+
 
     const p1Updated = await prisma.product.findUnique({ where: { id: p1.id } });
     const p2Updated = await prisma.product.findUnique({ where: { id: p2.id } });

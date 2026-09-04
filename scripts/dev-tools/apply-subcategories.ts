@@ -386,8 +386,9 @@ export async function applySubcategories(options?: { dryRun?: boolean; batchSize
           },
         })
       ),
-      { maxWait: 10000, timeout: 60000 }
+      { maxWait: 10000, timeout: 60000 } as any
     );
+
 
     console.log(`  ✓ اكتملت الدفعة [${batchIndex}/${totalBatches}] بنجاح (${Math.min(i + batchSize, updatesToExecute.length)}/${updatesToExecute.length}).`);
   }
