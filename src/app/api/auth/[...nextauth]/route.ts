@@ -3,6 +3,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 import { loginCache, checkRateLimit, resetRateLimit } from "@/lib/rateLimit";
+import { validateEnv } from "@/lib/env";
+
+// Fail-Closed: Validate mandatory environment variables before NextAuth initialization
+validateEnv();
 
 export const authOptions: NextAuthOptions = {
   providers: [
