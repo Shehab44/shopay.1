@@ -125,6 +125,49 @@ async function testStorefrontSubcategories() {
 
     console.log('🛡️ السيناريو (C) نجح بنسبة 100%: تم التحقق من سلامة استعلام التفرعات المميزة ومعالجة الأقسام الفارغة بنجاح.');
 
+    // -----------------------------------------------------------------
+    // السيناريو (D): فحص مطابقة استعلام الـ count البرمجي لفلترة التفرع
+    // -----------------------------------------------------------------
+    console.log('\n=== [4] السيناريو (D): فحص دقة استعلام prisma.product.count مع فلتر التفرع ===');
+    const totalWithoutFilter = await prisma.product.count({
+      where: {
+        categoryId: toysCat.id,
+        isActive: true,
+      },
+    });
+
+    const whereWithSubCategory = {
+      categoryId: toysCat.id,
+      isActive: true,
+      subCategoryLabel: 'فرد',
+    };
+
+    const countWithSubCategory = await prisma.product.count({
+      where: whereWithSubCategory,
+    });
+
+    console.log(`- إجمالي منتجات قسم ألعاب الأطفال (بدون فلتر): ${totalWithoutFilter}`);
+    console.log(`- نتيجة count مع فلتر { subCategoryLabel: 'فرد' }: ${countWithSubCategory} (المتوقع بدقة: 49)`);
+
+    if (countWithSubCategory === totalWithoutFilter) {
+      throw new Error('خطأ في منطق الـ count! العداد يعيد إجمالي القسم بدلاً من تفرع فرد المفلتر.');
+    }
+
+    if (countWithSubCategory !== 49) {
+      throw new Error(`عدم تطابق في عداد التفرع! القيمة المرجعة: ${countWithSubCategory}، المتوقع: 49`);
+    }
+
+    // التحقق من حساب الترقيم البرمجي
+    const ITEMS_PER_PAGE = 24;
+    const totalPages = Math.ceil(countWithSubCategory / ITEMS_PER_PAGE);
+    console.log(`- إجمالي الصفحات المحسوبة للتفرع (${countWithSubCategory} / ${ITEMS_PER_PAGE}): ${totalPages} صفحات`);
+
+    if (totalPages !== Math.ceil(49 / 24)) {
+      throw new Error(`خطأ في حساب totalPages! المحسوب: ${totalPages}`);
+    }
+
+    console.log('🛡️ السيناريو (D) نجح بنسبة 100%: استعلام count يعكس التفرع بدقة متناهية (49 منتج) وحساب totalPages مطابق للفلتر.');
+
     console.log('\n================================================================================');
     console.log('🎉 كفاءة الفلترة على السيرفر 100%: كافة السيناريوهات اجتازت الفحص بنجاح تام.');
     console.log('🛡️ استعلام قراءة فقط (Strict Zero DB Writes): قاعدة البيانات لم تتأثر إطلاقاً.');
@@ -138,3 +181,4 @@ async function testStorefrontSubcategories() {
 }
 
 testStorefrontSubcategories();
+

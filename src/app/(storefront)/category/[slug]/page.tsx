@@ -56,7 +56,7 @@ export default async function CategoryPage({
       .sort((a, b) => a.localeCompare(b, 'ar'));
   }
 
-  // Filters logic
+  // Filters logic: بناء شروط الاستعلام (whereClause) شاملاً القسم والتفرع والسعر والحالة النشطة
   const minPrice = resolvedSearchParams.min ? parseFloat(resolvedSearchParams.min as string) : undefined;
   const maxPrice = resolvedSearchParams.max ? parseFloat(resolvedSearchParams.max as string) : undefined;
   const sort = resolvedSearchParams.sort as string || "newest";
@@ -69,7 +69,7 @@ export default async function CategoryPage({
     whereClause.categoryId = category.id;
   }
 
-  // تطبيق فلترة التفرع على السيرفر إذا وُجد
+  // بناء whereClause شاملاً subCategoryLabel قبل تنفيذ أي استعلام لحساب الترقيم بدقة
   if (subCategory && subCategory !== 'all') {
     whereClause.subCategoryLabel = subCategory;
   }
@@ -84,14 +84,16 @@ export default async function CategoryPage({
   if (sort === 'price_asc') orderBy = { price: 'asc' };
   else if (sort === 'price_desc') orderBy = { price: 'desc' };
 
-  // Pagination Logic
+  // حساب الترقيم (Pagination Logic) بالاعتماد على نفس كائن whereClause المفلتر
   const ITEMS_PER_PAGE = 24;
   const currentPage = Math.max(1, Number(resolvedSearchParams.page) || 1);
   
+  // استعلام totalProducts يعتمد حصراً على whereClause المفلتر بالتفرع
   const totalProducts = await prisma.product.count({
     where: whereClause
   });
   
+  // ضبط حساب إجمالي الصفحات بدقة لعكس التصفية
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
   const skip = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -102,6 +104,7 @@ export default async function CategoryPage({
     take: ITEMS_PER_PAGE,
     orderBy
   });
+
 
   const subCategoryParam = subCategory ? `&subCategory=${encodeURIComponent(subCategory)}` : '';
 
