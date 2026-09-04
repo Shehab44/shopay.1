@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import prisma from '@/lib/db';
-import { requireAdmin } from '@/lib/adminAuth';
+import { requireAdmin } from '@/lib/auth-guard';
 
 export async function POST(request: Request) {
   try {
-    const authError = await requireAdmin();
-    if (authError) return authError;
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) return authResult;
 
     const formData = await request.formData();
     const file = formData.get('file') as File;

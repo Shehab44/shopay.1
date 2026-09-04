@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { requireAdmin } from '@/lib/adminAuth';
+import { requireAdmin } from '@/lib/auth-guard';
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authError = await requireAdmin();
-    if (authError) return authError;
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) return authResult;
 
     const { id } = await params;
     const body = await request.json();

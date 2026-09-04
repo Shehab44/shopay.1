@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { v2 as cloudinary } from 'cloudinary';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { requireAdmin } from '@/lib/auth-guard';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -16,11 +15,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 1. Verify Authentication (Extra Layer)
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'admin') {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
-    }
+    // 1. Verify Authentication & RBAC (Defense-in-Depth)
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) return authResult;
 
     // 2. Validate Product
     const resolvedParams = await params;
