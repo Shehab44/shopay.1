@@ -21,6 +21,7 @@
     "next-auth": "^4.24.15",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sonner": "^2.0.8",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
