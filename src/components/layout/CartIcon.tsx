@@ -11,7 +11,8 @@ export default function CartIcon() {
   
   // To avoid hydration mismatch, we only render the count after mounting on client
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const itemCount = mounted ? items.reduce((total, item) => total + item.quantity, 0) : 0;

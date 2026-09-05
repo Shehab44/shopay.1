@@ -125,10 +125,18 @@ export default function ProductListClient({
   noImage: boolean;
   selectedCategoryId?: number | null;
 }) {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState<any[]>(initialProducts);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialProducts.length === 30);
+  const [prevInitialProducts, setPrevInitialProducts] = useState(initialProducts);
   const loaderRef = useRef<HTMLDivElement>(null);
+
+  if (initialProducts !== prevInitialProducts) {
+    setPrevInitialProducts(initialProducts);
+    setProducts(initialProducts);
+    setPage(1);
+    setHasMore(initialProducts.length === 30);
+  }
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -167,29 +175,7 @@ export default function ProductListClient({
     }
   };
 
-  // Reset state when search parameters change
-  useEffect(() => {
-    setProducts(initialProducts);
-    setPage(1);
-    setHasMore(initialProducts.length === 30);
-  }, [initialProducts, q, noImage, selectedCategoryId]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && hasMore && !isLoading) {
-        loadMore();
-      }
-    }, { threshold: 0.1 });
-
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    
-    return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current);
-    };
-  }, [hasMore, page, isLoading]);
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
@@ -215,7 +201,23 @@ export default function ProductListClient({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, page, q, noImage, selectedCategoryId]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasMore && !isLoading) {
+        loadMore();
+      }
+    }, { threshold: 0.1 });
+
+    const currentLoader = loaderRef.current;
+    if (currentLoader) observer.observe(currentLoader);
+    
+    return () => {
+      if (currentLoader) observer.unobserve(currentLoader);
+    };
+  }, [hasMore, isLoading, loadMore]);
 
   const handleProductUpdated = (updatedProduct: any) => {
     setProducts((prev) =>

@@ -12,7 +12,8 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted) return <div className="min-h-[60vh] flex items-center justify-center">جاري التحميل...</div>;
