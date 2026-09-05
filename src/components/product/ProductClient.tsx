@@ -41,7 +41,7 @@ export default function ProductClient({ product }: { product: ProductWithCategor
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         {/* Product Image */}
-        <div className="bg-shopay-gray-light rounded-2xl aspect-square relative overflow-hidden border border-shopay-black/5 flex-shrink-0">
+        <div className="bg-shopay-gray-light rounded-2xl aspect-square relative overflow-hidden border border-shopay-black/5">
           <ProductImage
             matCode={product.matCode}
             databaseImageUrl={product.mainImageUrl}
