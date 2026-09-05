@@ -3,8 +3,8 @@ import prisma from "@/lib/db";
 import ProductCard from "@/components/product/ProductCard";
 import CategoryFilters from "@/components/category/CategoryFilters";
 import SubCategoryChips from "@/components/category/SubCategoryChips";
+import Pagination from "@/components/ui/Pagination";
 import Link from "next/link";
-import { ChevronRight, ChevronLeft } from "lucide-react";
 
 export default async function CategoryPage({ 
   params,
@@ -156,31 +156,11 @@ export default async function CategoryPage({
           )}
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12">
-              <Link 
-                href={`/category/${slug}?page=${Math.max(1, currentPage - 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}${subCategoryParam}`}
-                className={`w-10 h-10 flex items-center justify-center rounded-full border border-shopay-gray-light hover:border-shopay-purple transition-colors ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
-                aria-label="الصفحة السابقة"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Link>
-              
-              <div className="flex items-center gap-1 mx-2">
-                <span className="font-bold text-shopay-purple">{currentPage}</span>
-                <span className="text-shopay-black/50 text-sm mx-1">من</span>
-                <span className="font-bold text-shopay-black/70">{totalPages}</span>
-              </div>
-
-              <Link 
-                href={`/category/${slug}?page=${Math.min(totalPages, currentPage + 1)}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}${subCategoryParam}`}
-                className={`w-10 h-10 flex items-center justify-center rounded-full border border-shopay-gray-light hover:border-shopay-purple transition-colors ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
-                aria-label="الصفحة التالية"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Link>
-            </div>
-          )}
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            createPageURL={(pageNumber) => `/category/${slug}?page=${pageNumber}${minPrice ? `&min=${minPrice}` : ''}${maxPrice ? `&max=${maxPrice}` : ''}${sort !== 'newest' ? `&sort=${sort}` : ''}${subCategoryParam}`}
+          />
 
         </div>
       </div>
