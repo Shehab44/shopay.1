@@ -10,7 +10,7 @@ type ProductWithCategory = Prisma.ProductGetPayload<{
 
 export default function ProductCard({ product }: { product: ProductWithCategory }) {
   return (
-    <div className="bg-shopay-white rounded-xl border border-shopay-gray-light overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col group">
+    <div className="bg-shopay-white rounded-2xl border border-shopay-gray-light overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col group">
       
       {/* Image Container */}
       <Link href={`/product/${product.matCode}`} className="relative aspect-square overflow-hidden bg-shopay-gray-light block">
@@ -24,7 +24,7 @@ export default function ProductCard({ product }: { product: ProductWithCategory 
       </Link>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-5 flex flex-col flex-grow">
         <Link href={`/category/${product.category?.codePrefix}`} className="text-shopay-black/50 text-xs mb-1 hover:text-shopay-purple transition-colors block">
           {product.category?.nameAr}
         </Link>
@@ -34,7 +34,7 @@ export default function ProductCard({ product }: { product: ProductWithCategory 
         
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-shopay-gray-light/50">
           <div>
-            <div className="text-shopay-purple font-bold text-lg">
+            <div className="text-shopay-purple text-xl font-bold">
               {CURRENCY_SYMBOL}{product.price.toFixed(2)}
             </div>
             <div className="text-xs text-shopay-black/50">
