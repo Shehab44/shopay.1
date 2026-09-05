@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Share2, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
+import FooterActions from './FooterActions';
 
 export default function Footer() {
   return (
@@ -10,19 +11,12 @@ export default function Footer() {
           {/* Brand Info */}
           <div>
             <div className="mb-4">
-              <span className="text-3xl font-bold text-shopay-gradient bg-shopay-white px-2 rounded font-sans">SHOPAY</span>
+              <span className="text-3xl font-bold text-shopay-gradient bg-shopay-white px-2 rounded font-sans" dir="ltr">SHOPAY</span>
             </div>
             <p className="text-shopay-gray-light/80 text-sm leading-relaxed mb-6">
               بوابتك للتسوق الموثوق. خيارك الأول لشراء المنتجات بأسعار المفرق والجملة بأفضل جودة وأسرع توصيل.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-shopay-white/10 flex items-center justify-center hover:bg-shopay-purple transition-colors">
-                <Share2 className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-shopay-white/10 flex items-center justify-center hover:bg-shopay-purple transition-colors">
-                <MessageCircle className="w-5 h-5" />
-              </a>
-            </div>
+            <FooterActions />
           </div>
 
           {/* Quick Links */}

@@ -60,15 +60,7 @@ export default function ProductClient({ product }: { product: ProductWithCategor
             {product.nameAr}
           </h1>
 
-          {/* Dummy Reviews */}
-          <div className="flex items-center gap-1 text-yellow-400 mb-6">
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current text-shopay-gray-light" />
-            <span className="text-shopay-black/50 text-sm mr-2">(12 تقييم)</span>
-          </div>
+
 
           <div className="text-4xl font-bold text-shopay-purple mb-6">
             {CURRENCY_SYMBOL}{product.price.toFixed(2)}

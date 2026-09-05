@@ -1,0 +1,23 @@
+
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { revalidatePath } from 'next/cache';
+
+export async function updateProduct(id: number, data: any) {
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user as any).role !== 'admin') {
+    throw new Error('Unauthorized');
+  }
+
+  const updated = await prisma.product.update({
+    where: { id },
+    data: {
+      nameAr: data.nameAr,
+      price: parseFloat(data.price),
+      isActive: data.isActive,
+    }
+  });
+
+  revalidatePath('/admin/products');
+  return updated;
+}

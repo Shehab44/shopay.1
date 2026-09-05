@@ -92,7 +92,8 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
 
               {/* Text SHOPAY */}
               <motion.div
-                className="flex space-x-1 space-x-reverse"
+                className="flex space-x-1"
+                dir="ltr"
                 initial="hidden"
                 animate="visible"
                 variants={{

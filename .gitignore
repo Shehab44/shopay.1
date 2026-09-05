@@ -50,3 +50,6 @@ next-env.d.ts
 
 # Dev tools
 /scripts/dev-tools/
+
+shopay-source.txt
+audit_result.json

@@ -23,6 +23,7 @@ model Product {
   matCode        String      @unique @map("mat_code")
   nameAr         String      @map("name_ar")
   categoryId     Int?        @map("category_id")
+  subCategoryLabel String?   @map("sub_category_label")
   description    String?
   mainImageUrl   String?     @map("main_image_url")
   price          Float       @default(0)

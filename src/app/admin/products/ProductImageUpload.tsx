@@ -37,8 +37,8 @@ export default function ProductImageUpload({
       } else {
         alert(data.error || 'فشل رفع الصورة');
       }
-    } catch (err) {
-      alert('خطأ في الاتصال بالخادم');
+    } catch (err: any) {
+      alert(err.message || 'خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
       // Reset input so same file can be selected again if needed
