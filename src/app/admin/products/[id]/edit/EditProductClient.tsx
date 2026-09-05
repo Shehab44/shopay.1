@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProduct } from '../../actions';
+import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
 export default function EditProductClient({ product }: { product: any }) {
@@ -19,10 +20,10 @@ export default function EditProductClient({ product }: { product: any }) {
     setLoading(true);
     try {
       await updateProduct(product.id, formData);
-      alert('تم تحديث المنتج بنجاح');
+      toast.success('تم تحديث المنتج بنجاح');
       router.push('/admin/products');
     } catch (err) {
-      alert('حدث خطأ أثناء التحديث');
+      toast.error('حدث خطأ أثناء التحديث');
     } finally {
       setLoading(false);
     }

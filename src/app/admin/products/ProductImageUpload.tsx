@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { UploadCloud, CheckCircle, Loader2 } from "lucide-react";
 import ProductImage from "@/components/ui/ProductImage";
+import { toast } from "sonner";
 
 export default function ProductImageUpload({ 
   productId, 
@@ -34,11 +35,12 @@ export default function ProductImageUpload({
       
       if (res.ok) {
         setImageUrl(data.imageUrl);
+        toast.success('تم رفع الصورة بنجاح');
       } else {
-        alert(data.error || 'فشل رفع الصورة');
+        toast.error(data.error || 'فشل رفع الصورة');
       }
     } catch (err: any) {
-      alert(err.message || 'خطأ في الاتصال بالخادم');
+      toast.error(err.message || 'خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
       // Reset input so same file can be selected again if needed
