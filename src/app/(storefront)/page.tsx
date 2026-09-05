@@ -23,8 +23,8 @@ export default async function Home() {
       
       {/* Hero Banner */}
       <section className="bg-shopay-gradient text-shopay-white relative overflow-hidden">
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10 flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0 text-center md:text-right">
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+          <div className="w-full md:flex-1 text-center md:text-right">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 font-sans leading-tight">
               أهلاً بك في <span className="text-shopay-white/90">SHOPAY</span>
             </h1>
@@ -38,7 +38,7 @@ export default async function Home() {
               تسوق الآن
             </Link>
           </div>
-          <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-2xl overflow-hidden shadow-2xl">
+          <div className="w-full md:flex-1 relative h-64 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
             {/* Elegant Gradient Banner Placeholder */}
             <div className="absolute inset-0 bg-gradient-to-br from-shopay-purple via-purple-900 to-shopay-black flex flex-col items-center justify-center p-6 text-center border border-shopay-white/10">
               <div className="w-24 h-24 mb-6 rounded-full bg-shopay-white/10 flex items-center justify-center backdrop-blur-md">
