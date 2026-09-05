@@ -15,7 +15,7 @@ export default function ProductImage({ matCode, alt, databaseImageUrl, ...props 
   // 3. Fallback: Placeholder.
   
   const initialSrc = databaseImageUrl || `/images/products/${matCode}.jpg`;
-  const fallbackSrc = `https://placehold.co/600x600/f5f5f7/5B2A6E?text=${encodeURIComponent(matCode)}`;
+  const fallbackSrc = `https://placehold.co/600x600/f5f5f7/5B2A6E`;
 
   const [src, setSrc] = useState(initialSrc);
   const [errorCount, setErrorCount] = useState(0);
