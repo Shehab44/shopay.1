@@ -4,7 +4,7 @@ import { CURRENCY_SYMBOL } from "@/lib/constants";
 import { useState } from "react";
 import ProductImage from "../ui/ProductImage";
 import { Prisma } from "@prisma/client";
-import { ShoppingCart, Check, Star, AlertCircle } from "lucide-react";
+import { ShoppingCart, Check, AlertCircle } from "lucide-react";
 import { useCartStore } from "@/lib/store/cartStore";
 
 type ProductWithCategory = Prisma.ProductGetPayload<{

@@ -32,7 +32,7 @@ export default function OrderStatusSelect({
         setStatus(initialStatus); // revert on error
         alert("فشل تحديث حالة الطلب");
       }
-    } catch (err) {
+    } catch {
       setStatus(initialStatus);
       alert("حدث خطأ في الاتصال");
     } finally {

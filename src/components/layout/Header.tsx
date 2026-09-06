@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShoppingCart, User, Heart } from 'lucide-react';
+import { User, Heart } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import prisma from '@/lib/db';
 import CartIcon from './CartIcon';

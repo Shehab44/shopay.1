@@ -1,6 +1,4 @@
-import { CURRENCY_SYMBOL } from "@/lib/constants";
 import prisma from "@/lib/db";
-import Link from "next/link";
 import { Search } from "lucide-react";
 import ProductListClient from "./ProductListClient";
 import NoImageFilter from "./NoImageFilter";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import prisma from '@/lib/db';
@@ -20,8 +21,8 @@ export async function POST(request: Request) {
     
     const workbook = new ExcelJS.Workbook();
     try {
-      await workbook.xlsx.load(buffer as unknown);
-    } catch (e) {
+      await workbook.xlsx.load(buffer as any);
+    } catch {
       return NextResponse.json({ error: 'صيغة الملف غير مدعومة. يرجى رفع ملف Excel (xlsx).' }, { status: 400 });
     }
 
@@ -30,8 +31,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'الملف فارغ أو لا يحتوي على صفحات' }, { status: 400 });
     }
 
-    const records: Record<string, unknown>[] = [];
-    let headers: string[] = [];
+    const records: Record<string, any>[] = [];
+    const headers: string[] = [];
 
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
           headers[colNumber] = cell.value?.toString().trim() || `Column${colNumber}`;
         });
       } else {
-        const record: Record<string, unknown> = {};
+        const record: Record<string, any> = {};
         row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
           const header = headers[colNumber];
           if (header) {
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
       errors: errors.slice(0, 5), // Return top 5 errors max for preview
     });
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Preview error:', error);
     return NextResponse.json({ error: (error instanceof Error ? error.message : String(error)) || 'حدث خطأ غير متوقع' }, { status: 500 });
   }

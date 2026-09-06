@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import prisma from '@/lib/db';
@@ -17,7 +18,7 @@ export async function getMoreProducts(
     throw new Error('Unauthorized: Admin access required');
   }
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, any> = {};
   if (q) {
     where.OR = [
       { nameAr: { contains: q } },
@@ -42,13 +43,13 @@ export async function getMoreProducts(
   return products;
 }
 
-export async function updateProduct(id: number, data: unknown) {
+export async function updateProduct(id: number, data: any) {
   const auth = await requireAdmin();
   if (auth instanceof NextResponse) {
     throw new Error('Unauthorized: Admin access required');
   }
 
-  const updateData: Record<string, unknown> = {};
+  const updateData: Record<string, any> = {};
   if (data.nameAr !== undefined) updateData.nameAr = data.nameAr;
   if (data.price !== undefined) updateData.price = parseFloat(data.price);
   if (data.isActive !== undefined) updateData.isActive = data.isActive;

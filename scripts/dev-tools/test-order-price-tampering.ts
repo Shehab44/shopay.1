@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Test Script: Verify server rejects or ignores client-side price tampering in orders route
 
 import { PrismaClient } from '@prisma/client';
@@ -7,7 +8,7 @@ const prisma = new PrismaClient();
 async function testOrderPriceTampering() {
   const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:3000';
   const testPhone = '00033322211';
-  let targetProduct: Record<string, unknown> = null;
+  let targetProduct: any = null;
   let originalStock = 0;
   let createdOrderId: number | null = null;
 
@@ -121,7 +122,7 @@ async function testOrderPriceTampering() {
 
     console.log('\n🎉 الفحص ناجح بنسبة 100%: تم عزل واحتساب أسعار الطلبات بالسيرفر بالكامل.');
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('\n❌ فشل اختبار عزل الأسعار:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
@@ -149,7 +150,7 @@ async function testOrderPriceTampering() {
       }
 
       console.log('✅ تم الانتهاء من التنظيف: قاعدة البيانات نظيفة 100%.');
-    } catch (cleanupErr: unknown) {
+    } catch (cleanupErr: any) {
       console.error('خطأ أثناء التنظيف:', (cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr)));
     } finally {
       await prisma.$disconnect();

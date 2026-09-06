@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, User, Heart } from "lucide-react";
 
-export default function MobileMenu({ categories }: { categories: unknown[] }) {
+export default function MobileMenu({ categories }: { categories: any[] }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function MobileMenu({ categories }: { categories: unknown[] }) {
           
           <div className="h-px w-full bg-shopay-gray-light my-2"></div>
           
-          {categories.map((cat: unknown) => (
+          {categories.map((cat: any) => (
             <Link 
               key={cat.id} 
               onClick={() => setIsOpen(false)} 

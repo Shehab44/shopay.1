@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import { notFound } from "next/navigation";
 import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
 import Link from "next/link";
-import { ArrowRight, MapPin, Phone, User, Package } from "lucide-react";
+import { ArrowRight, MapPin, User, Package } from "lucide-react";
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { UploadCloud, CheckCircle, Loader2 } from "lucide-react";
+import { UploadCloud, Loader2 } from "lucide-react";
 import ProductImage from "@/components/ui/ProductImage";
 import { toast } from "sonner";
 

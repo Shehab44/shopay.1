@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAdmin } from '@/lib/auth-guard';
 
-export async function GET(
-  request: Request,
+export async function GET(_request: Request, 
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAdmin();
@@ -62,7 +61,7 @@ export async function PUT(
     // 1. Validate and update categoryId if provided
     if (body.categoryId !== undefined) {
       if (body.categoryId === null || body.categoryId === '') {
-        updateData.categoryId = null;
+        updateData.category = { disconnect: true };
       } else {
         const catId = parseInt(body.categoryId);
         if (isNaN(catId)) {
@@ -72,7 +71,7 @@ export async function PUT(
         if (!categoryExists) {
           return NextResponse.json({ error: 'القسم المحدد غير موجود' }, { status: 400 });
         }
-        updateData.categoryId = catId;
+        updateData.category = { connect: { id: catId } };
       }
     }
 
@@ -100,8 +99,7 @@ export async function PUT(
 
 export const PATCH = PUT;
 
-export async function DELETE(
-  request: Request,
+export async function DELETE(_request: Request, 
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAdmin();

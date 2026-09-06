@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
@@ -21,7 +22,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("يرجى إدخال رقم الهاتف وكلمة المرور");
         }
 
-        const ip = req?.headers?.['x-forwarded-for'] || 'unknown-ip';
+        const ip = req?.headers?.['x-forwarded-for'] || 'any-ip';
         const rateLimitKey = `${ip}_${credentials.phone}`;
 
         const { success } = checkRateLimit(loginCache, rateLimitKey, 5);
@@ -62,15 +63,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as unknown).role;
+        token.role = (user as any).role;
         token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as unknown).role = token.role;
-        (session.user as unknown).id = token.id;
+        (session.user as any).role = token.role;
+        (session.user as any).id = token.id;
       }
       return session;
     }

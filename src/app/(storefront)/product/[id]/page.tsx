@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation";
 import prisma from "@/lib/db";
 import ProductClient from "@/components/product/ProductClient";
@@ -16,5 +17,5 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  return <ProductClient product={product as unknown} />;
+  return <ProductClient product={product as any} />;
 }

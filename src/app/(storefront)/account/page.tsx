@@ -1,4 +1,4 @@
-import { User, Package, Heart, Settings, LogOut } from "lucide-react";
+import { User, Package, Heart, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function AccountPage() {

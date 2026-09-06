@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation";
 import prisma from "@/lib/db";
 import ProductCard from "@/components/product/ProductCard";
 import CategoryFilters from "@/components/category/CategoryFilters";
 import SubCategoryChips from "@/components/category/SubCategoryChips";
 import Pagination from "@/components/ui/Pagination";
-import Link from "next/link";
 
 export default async function CategoryPage({ 
   params,
@@ -61,7 +61,7 @@ export default async function CategoryPage({
   const maxPrice = resolvedSearchParams.max ? parseFloat(resolvedSearchParams.max as string) : undefined;
   const sort = resolvedSearchParams.sort as string || "newest";
 
-  const whereClause: Record<string, unknown> = { 
+  const whereClause: any = { 
     isActive: true 
   };
   
@@ -80,7 +80,7 @@ export default async function CategoryPage({
     if (maxPrice !== undefined) whereClause.price.lte = maxPrice;
   }
 
-  let orderBy: Record<string, unknown> = { id: 'desc' }; // default newest
+  let orderBy: any = { id: 'desc' }; // default newest
   if (sort === 'price_asc') orderBy = { price: 'asc' };
   else if (sort === 'price_desc') orderBy = { price: 'desc' };
 
@@ -145,7 +145,7 @@ export default async function CategoryPage({
 
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {products.map(product => (
-              <ProductCard key={product.id} product={product as unknown} />
+              <ProductCard key={product.id} product={product as any} />
             ))}
           </div>
           

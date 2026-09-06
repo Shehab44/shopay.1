@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { v2 as cloudinary } from 'cloudinary';
@@ -43,7 +44,7 @@ export async function POST(
     const buffer = Buffer.from(bytes);
 
     // 4. Upload to Cloudinary using upload_stream
-    const uploadResult = await new Promise<unknown>((resolve, reject) => {
+    const uploadResult = await new Promise<any>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'shopay/products',
@@ -90,7 +91,7 @@ export async function POST(
       imageUrl: updatedProduct.mainImageUrl 
     });
     
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Upload image error:', error);
 
     if (process.env.NODE_ENV === 'production') {

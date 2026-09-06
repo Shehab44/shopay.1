@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Loader2, CheckCircle } from "lucide-react";
@@ -39,7 +39,7 @@ export default function ContactForm() {
       if (result.success) {
         setIsSuccess(true);
       }
-    } catch (error) {
+    } catch {
       setErrors({ global: "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً." });
     } finally {
       setIsSubmitting(false);

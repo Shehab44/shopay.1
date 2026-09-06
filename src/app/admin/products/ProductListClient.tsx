@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Edit, Check, AlertCircle } from "lucide-react";
+import { Edit } from "lucide-react";
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 import ProductImageUpload from "./ProductImageUpload";
 import { getMoreProducts } from "./actions";
@@ -20,9 +21,9 @@ function InlineCategoryEditor({
   categories,
   onUpdated,
 }: {
-  product: unknown;
+  product: any;
   categories: Category[];
-  onUpdated: (updatedProduct: unknown) => void;
+  onUpdated: (updatedproduct: any) => void;
 }) {
   const [selectedCatId, setSelectedCatId] = useState<string>(
     product.categoryId ? product.categoryId.toString() : ""
@@ -59,7 +60,7 @@ function InlineCategoryEditor({
       onUpdated(data.product);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
-    } catch (e: unknown) {
+    } catch (e: any) {
       console.error("Save product category error:", e);
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 3000);
@@ -119,13 +120,13 @@ export default function ProductListClient({
   noImage,
   selectedCategoryId
 }: { 
-  initialProducts: unknown[];
+  initialProducts: any[];
   categories?: Category[];
   q: string;
   noImage: boolean;
   selectedCategoryId?: number | null;
 }) {
-  const [products, setProducts] = useState<unknown[]>(initialProducts);
+  const [products, setProducts] = useState<any[]>(initialProducts);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialProducts.length === 30);
   const [prevInitialProducts, setPrevInitialProducts] = useState(initialProducts);
@@ -142,10 +143,10 @@ export default function ProductListClient({
 
   // Status Modal States
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [selectedProductForStatus, setSelectedProductForStatus] = useState<unknown>(null);
+  const [selectedProductForStatus, setSelectedProductForStatus] = useState<any>(null);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
-  const handleToggleStatusClick = (product: unknown) => {
+  const handleToggleStatusClick = (product: any) => {
     setSelectedProductForStatus(product);
     setIsStatusModalOpen(true);
   };
@@ -154,11 +155,11 @@ export default function ProductListClient({
     if (!selectedProductForStatus) return;
     setIsTogglingStatus(true);
     try {
-      const res = await fetch(`/api/v1/admin/products/${selectedProductForStatus.id}`, {
+      const res = await fetch(`/api/v1/admin/products/${(selectedProductForStatus as any).id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          isActive: !selectedProductForStatus.isActive
+          isActive: !(selectedProductForStatus as any).isActive
         }),
       });
 
@@ -168,7 +169,7 @@ export default function ProductListClient({
       handleProductUpdated(data.product);
       toast.success("تم تغيير حالة المنتج بنجاح");
       setIsStatusModalOpen(false);
-    } catch (e) {
+    } catch {
       toast.error("حدث خطأ أثناء تغيير الحالة");
     } finally {
       setIsTogglingStatus(false);
@@ -219,9 +220,9 @@ export default function ProductListClient({
     };
   }, [hasMore, isLoading, loadMore]);
 
-  const handleProductUpdated = (updatedProduct: unknown) => {
+  const handleProductUpdated = (updatedproduct: any) => {
     setProducts((prev) =>
-      prev.map((p) => (p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p))
+      prev.map((p) => (p.id === updatedproduct.id ? { ...p, ...updatedproduct } : p))
     );
   };
 

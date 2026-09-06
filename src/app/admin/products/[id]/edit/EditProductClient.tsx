@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -6,7 +7,7 @@ import { updateProduct } from '../../actions';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
-export default function EditProductClient({ product }: { product: unknown }) {
+export default function EditProductClient({ product }: { product: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ export default function EditProductClient({ product }: { product: unknown }) {
       await updateProduct(product.id, formData);
       toast.success('تم تحديث المنتج بنجاح');
       router.push('/admin/products');
-    } catch (err) {
+    } catch {
       toast.error('حدث خطأ أثناء التحديث');
     } finally {
       setLoading(false);

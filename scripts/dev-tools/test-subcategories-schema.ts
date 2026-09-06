@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // اختبار عزل للتحقق من حفظ حقل subCategoryLabel وعمل سكريبت التراجع بنسبة 100% دون التأثير على categoryId
 
 import { PrismaClient } from '@prisma/client';
@@ -6,7 +7,7 @@ import { revertSubcategories } from './revert-subcategories';
 const prisma = new PrismaClient();
 
 async function testSubcategoriesSchema() {
-  let targetProduct: Record<string, unknown> = null;
+  let targetProduct: any = null;
   let originalSubCategoryLabel: string | null = null;
   let originalCategoryId: number | null = null;
 
@@ -79,7 +80,7 @@ async function testSubcategoriesSchema() {
 
     console.log('\n🎉 كفاءة المعمارية والتراجع 100%: تم اجتياز الفحص بنجاح تام وتأكيد المعمارية غير المدمرة.');
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('\n❌ فشل اختبار معمارية التفرعات:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
@@ -93,7 +94,7 @@ async function testSubcategoriesSchema() {
         console.log(`- تم استعادة الحالة الأصلية للمنتج ID=${targetProduct.id} بنجاح.`);
       }
       console.log('✅ اكتمل التنظيف: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية بنسبة 100%.');
-    } catch (cleanupError: unknown) {
+    } catch (cleanupError: any) {
       console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();

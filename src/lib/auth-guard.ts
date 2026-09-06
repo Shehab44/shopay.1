@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
@@ -20,7 +21,7 @@ export async function requireAdmin() {
     );
   }
 
-  const role = (session.user as unknown)?.role;
+  const role = (session.user as any)?.role;
   if (!role || role.toUpperCase() !== 'ADMIN') {
     return NextResponse.json(
       { success: false, error: 'Forbidden - Admin access required' },

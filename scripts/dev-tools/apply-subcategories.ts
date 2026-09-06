@@ -377,7 +377,7 @@ export async function applySubcategories(options?: { dryRun?: boolean; batchSize
     const batchIndex = Math.floor(i / batchSize) + 1;
     const totalBatches = Math.ceil(updatesToExecute.length / batchSize);
 
-    await prisma.$transaction(
+    await (prisma as any).$transaction(
       batch.map((item) =>
         prisma.product.update({
           where: { id: item.id },

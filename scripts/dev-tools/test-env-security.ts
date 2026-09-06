@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * أداة فحص واختبار أمني: التحقق من انضباط متغيرات البيئة ومبدأ Fail-Closed لـ NextAuth
  * (Fail-Closed Environment & NextAuth Secret Security Isolation Test)
@@ -35,14 +36,14 @@ async function testEnvSecurity() {
     process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-secret-key-1234567890123456';
     process.env.NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
-    let validatedResult: Record<string, unknown> = null;
+    let validatedResult: any = null;
     try {
       validatedResult = validateEnv();
       console.log('✅ نجح استدعاء validateEnv() في بيئة مكتملة وصالحة.');
       console.log(`- DATABASE_URL: موجود (${validatedResult.DATABASE_URL.slice(0, 10)}...)`);
       console.log(`- NEXTAUTH_URL: ${validatedResult.NEXTAUTH_URL}`);
       console.log(`- NEXTAUTH_SECRET: محمي ومحدد.`);
-    } catch (err: unknown) {
+    } catch (err: any) {
       throw new Error(`فشل السيناريو (A)! أطلقت validateEnv خطأ غير متوقع في بيئة صالحة: ${(err instanceof Error ? err.message : String(err))}`);
     }
 
@@ -64,7 +65,7 @@ async function testEnvSecurity() {
 
     try {
       validateEnv();
-    } catch (err: unknown) {
+    } catch (err: any) {
       threwExpectedError = true;
       caughtErrorMessage = (err instanceof Error ? err.message : String(err)) || '';
       console.log('رسالة الخطأ الملتقطة بنجاح عند الفقدان:', caughtErrorMessage);
@@ -82,7 +83,7 @@ async function testEnvSecurity() {
 
     console.log('\n🎉 كفاءة أمان متغيرات البيئة 100%: تم اجتياز الفحص والتحقق من انضباط مسار التوثيق.');
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('\n❌ فشل اختبار أمان متغيرات البيئة:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
@@ -99,7 +100,7 @@ async function testEnvSecurity() {
 
       console.log('- تم استرجاع NEXTAUTH_SECRET الأصلي في الذاكرة بنجاح.');
       console.log('✅ اكتمل التنظيف: متغيرات البيئة بالذاكرة استُعيدت لحالتها الأصلية بنسبة 100%.');
-    } catch (cleanupError: unknown) {
+    } catch (cleanupError: any) {
       console.error('خطأ أثناء عملية تنظيف واستعادة البيئة:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     }
   }

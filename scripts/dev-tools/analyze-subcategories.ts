@@ -164,7 +164,7 @@ async function analyzeSubcategories() {
     // ترتيب الكلمات تنازلياً حسب التكرار واختيار أعلى 12 إلى 15 كلمة
     const sortedWords = Array.from(wordCounts.entries())
       .sort((a, b) => b[1] - a[1])
-      .filter(([_, count]) => count >= 2);
+      .filter((item) => item[1] >= 2);
 
     const topCandidates = sortedWords.slice(0, 15);
 
