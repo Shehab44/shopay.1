@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function OrderStatusSelect({ 
   orderId, 
@@ -30,11 +31,11 @@ export default function OrderStatusSelect({
         router.refresh();
       } else {
         setStatus(initialStatus); // revert on error
-        alert("فشل تحديث حالة الطلب");
+        toast.error("فشل تحديث حالة الطلب");
       }
     } catch {
       setStatus(initialStatus);
-      alert("حدث خطأ في الاتصال");
+      toast.error("حدث خطأ في الاتصال");
     } finally {
       setLoading(false);
     }

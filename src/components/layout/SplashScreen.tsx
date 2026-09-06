@@ -9,29 +9,37 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
 
   const handleSkip = () => {
     setShowSplash(false);
-    sessionStorage.setItem("hasSeenSplash", "true");
+    localStorage.setItem("hasSeenSplash", "true");
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMounted(true);
-      const hasSeenSplash = sessionStorage.getItem("hasSeenSplash");
+      const hasSeenSplash = localStorage.getItem("hasSeenSplash");
       if (hasSeenSplash) {
         setShowSplash(false);
       }
     }, 0);
 
-    let splashTimer: NodeJS.Timeout;
-    const hasSeenSplashInitial = sessionStorage.getItem("hasSeenSplash");
+    const hasSeenSplashInitial = localStorage.getItem("hasSeenSplash");
+    const onComplete = () => {
+      // delay slightly so the animation at least plays a bit
+      setTimeout(handleSkip, 1500);
+    };
+
     if (!hasSeenSplashInitial) {
-      splashTimer = setTimeout(() => {
-        handleSkip();
-      }, 3500);
+      if (document.readyState === "complete") {
+        onComplete();
+      } else {
+        window.addEventListener("load", onComplete);
+        // Fallback max time
+        setTimeout(handleSkip, 4000);
+      }
     }
     
     return () => {
       clearTimeout(timer);
-      if (splashTimer) clearTimeout(splashTimer);
+      window.removeEventListener("load", onComplete);
     };
   }, []);
 

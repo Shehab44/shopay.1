@@ -20,11 +20,14 @@ export default function CartIcon() {
   return (
     <Link href="/cart" className="relative text-shopay-black hover:text-shopay-purple transition-colors">
       <ShoppingCart className="w-6 h-6" />
-      {itemCount > 0 && (
+      
+      {!mounted ? (
+        <span className="absolute -top-2 -right-2 bg-gray-200 min-w-5 h-5 rounded-full flex items-center justify-center px-1 animate-pulse" />
+      ) : itemCount > 0 ? (
         <span className="absolute -top-2 -right-2 bg-shopay-purple text-shopay-white text-xs font-bold min-w-5 h-5 rounded-full flex items-center justify-center px-1">
           {itemCount}
         </span>
-      )}
+      ) : null}
     </Link>
   );
 }

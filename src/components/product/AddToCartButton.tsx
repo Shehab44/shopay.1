@@ -3,6 +3,7 @@
 
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/lib/store/cartStore';
+import { toast } from 'sonner';
 
 export default function AddToCartButton({ product }: { product: any }) {
   const addItem = useCartStore((state) => state.addItem);
@@ -16,7 +17,7 @@ export default function AddToCartButton({ product }: { product: any }) {
       mainImageUrl: product.mainImageUrl || '',
       quantity: 1,
     });
-    alert("تم إضافة المنتج للسلة بنجاح!");
+    toast.success("تم إضافة المنتج للسلة بنجاح!");
   };
 
   if (product.price <= 0) {

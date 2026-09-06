@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
+import { OTPInput } from "input-otp";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -41,6 +42,10 @@ export default function RegisterPage() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (otpCode.length !== 4) {
+      setError("الرجاء إدخال رمز التحقق بالكامل");
+      return;
+    }
     setError("");
     setLoading(true);
 
@@ -114,14 +119,34 @@ export default function RegisterPage() {
           <form onSubmit={handleVerifyOtp} className="space-y-4">
              <div>
               <label className="block text-sm font-semibold text-shopay-black mb-1">رمز التحقق (OTP)</label>
-              <input 
-                type="text" 
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full p-3 text-center tracking-widest font-mono text-xl rounded-lg border border-shopay-gray-light focus:outline-none focus:ring-2 focus:ring-shopay-purple/50 bg-shopay-purple/5"
-                placeholder="0000"
-                required
-              />
+              <div dir="ltr" className="flex justify-center">
+                <OTPInput
+                  maxLength={4}
+                  value={otpCode}
+                  onChange={(val) => setOtpCode(val)}
+                  render={({ slots }) => (
+                    <div className="flex gap-3">
+                      {slots.map((slot, idx) => (
+                        <div
+                          key={idx}
+                          className={`relative w-12 h-14 flex items-center justify-center text-2xl font-bold rounded-md border transition-all ${
+                            slot.isActive
+                              ? "border-shopay-purple ring-2 ring-shopay-purple/20 bg-shopay-purple/5"
+                              : "border-shopay-gray-light bg-shopay-gray-light/30"
+                          }`}
+                        >
+                          {slot.char !== null ? slot.char : ""}
+                          {slot.hasFakeCaret && (
+                            <div className="absolute pointer-events-none inset-0 flex items-center justify-center animate-caret-blink">
+                              <div className="w-px h-8 bg-shopay-purple" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
+              </div>
               <div className="text-xs text-shopay-black/50 mt-1 text-center">
                 (للتجربة حالياً: الكود مطبوع في موجه الأوامر Terminal)
               </div>
