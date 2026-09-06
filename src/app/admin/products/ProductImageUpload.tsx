@@ -39,8 +39,8 @@ export default function ProductImageUpload({
       } else {
         toast.error(data.error || 'فشل رفع الصورة');
       }
-    } catch (err: any) {
-      toast.error(err.message || 'خطأ في الاتصال بالخادم');
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : String(err)) || 'خطأ في الاتصال بالخادم');
     } finally {
       setLoading(false);
       // Reset input so same file can be selected again if needed

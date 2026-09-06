@@ -26,8 +26,8 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, product });
-  } catch (error: any) {
-    console.error('Admin get product error:', error);
+  } catch (error: unknown) {
+    console.error('Admin get product error:', error instanceof Error ? error.message : String(error));
     return NextResponse.json({ error: 'حدث خطأ أثناء جلب بيانات المنتج' }, { status: 500 });
   }
 }
@@ -52,7 +52,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const updateData: any = {};
+    const updateData: import('@prisma/client').Prisma.ProductUpdateInput = {};
 
     if (body.nameAr !== undefined) updateData.nameAr = body.nameAr;
     if (body.price !== undefined) updateData.price = parseFloat(body.price);
@@ -92,8 +92,8 @@ export async function PUT(
     });
 
     return NextResponse.json({ success: true, product: updated });
-  } catch (error: any) {
-    console.error('Admin update product error:', error);
+  } catch (error: unknown) {
+    console.error('Admin update product error:', error instanceof Error ? error.message : String(error));
     return NextResponse.json({ error: 'حدث خطأ أثناء تحديث المنتج' }, { status: 500 });
   }
 }
@@ -116,8 +116,8 @@ export async function DELETE(
 
     await prisma.product.delete({ where: { id: productId } });
     return NextResponse.json({ success: true, message: 'تم حذف المنتج بنجاح' });
-  } catch (error: any) {
-    console.error('Admin delete product error:', error);
+  } catch (error: unknown) {
+    console.error('Admin delete product error:', error instanceof Error ? error.message : String(error));
     return NextResponse.json({ error: 'حدث خطأ أثناء حذف المنتج' }, { status: 500 });
   }
 }

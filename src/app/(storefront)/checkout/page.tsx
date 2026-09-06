@@ -84,8 +84,8 @@ export default function CheckoutPage() {
         router.push("/");
       }, 3000);
 
-    } catch (err: any) {
-      setErrorMsg(err.message);
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }

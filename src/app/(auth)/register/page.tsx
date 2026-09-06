@@ -32,8 +32,8 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.error || "فشل إرسال الكود");
       
       setStep(2);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
@@ -62,8 +62,8 @@ export default function RegisterPage() {
       
       // Success, redirect to login
       router.push("/login?registered=true");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }

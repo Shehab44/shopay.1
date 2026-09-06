@@ -22,7 +22,7 @@ export default async function AdminProductsPage({
     orderBy: { codePrefix: "asc" },
   });
   
-  const where: any = {};
+  const where: Record<string, unknown> = {};
   if (q) {
     where.OR = [
       { nameAr: { contains: q } },

@@ -120,7 +120,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: 'إجراء غير معروف' }, { status: 400 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Registration API Error:', error);
     return NextResponse.json({ error: 'حدث خطأ في الخادم' }, { status: 500 });
   }

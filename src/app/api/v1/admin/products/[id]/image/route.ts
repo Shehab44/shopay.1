@@ -43,7 +43,7 @@ export async function POST(
     const buffer = Buffer.from(bytes);
 
     // 4. Upload to Cloudinary using upload_stream
-    const uploadResult = await new Promise<any>((resolve, reject) => {
+    const uploadResult = await new Promise<unknown>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'shopay/products',
@@ -90,7 +90,7 @@ export async function POST(
       imageUrl: updatedProduct.mainImageUrl 
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Upload image error:', error);
 
     if (process.env.NODE_ENV === 'production') {
@@ -98,8 +98,8 @@ export async function POST(
     }
 
     return NextResponse.json({ 
-      error: error.message || 'حدث خطأ أثناء رفع الصورة',
-      stack: error.stack 
+      error: (error instanceof Error ? error.message : String(error)) || 'حدث خطأ أثناء رفع الصورة',
+      stack: (error instanceof Error ? error.stack : String(error)) 
     }, { status: 500 });
   }
 }

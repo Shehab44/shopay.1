@@ -91,7 +91,7 @@ async function testApplySubcategories() {
       prisma.product.update({ where: { id: p1.id }, data: { subCategoryLabel: label1 } }),
       prisma.product.update({ where: { id: p2.id }, data: { subCategoryLabel: label2 } }),
       prisma.product.update({ where: { id: p3.id }, data: { subCategoryLabel: label3 } }),
-    ], { maxWait: 10000, timeout: 60000 } as any);
+    ], { maxWait: 10000, timeout: 60000 } as unknown);
 
 
     const p1Updated = await prisma.product.findUnique({ where: { id: p1.id } });
@@ -146,8 +146,8 @@ async function testApplySubcategories() {
     console.log('🛡️ السيناريو (C) نجح بنسبة 100%: سكريبت التراجع صفر القيم بنجاح وأعاد الحالة إلى null.');
 
     console.log('\n🎉 كفاءة التسكين والعزل 100%: كافة السيناريوهات اجتازت الفحص بنجاح تام.');
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار تسكين التفرعات:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار تسكين التفرعات:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [5] تنظيف بيانات الاختبار من قاعدة البيانات ===');
@@ -157,8 +157,8 @@ async function testApplySubcategories() {
       });
       console.log(`- تم حذف المنتجات التجريبية (${deleted.count} منتج).`);
       console.log('✅ اكتمل التنظيف بنسبة 100%: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية.');
-    } catch (cleanupError: any) {
-      console.error('خطأ أثناء عملية التنظيف:', cleanupError.message);
+    } catch (cleanupError: unknown) {
+      console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();
     }
@@ -166,3 +166,4 @@ async function testApplySubcategories() {
 }
 
 testApplySubcategories();
+

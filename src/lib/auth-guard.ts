@@ -20,7 +20,7 @@ export async function requireAdmin() {
     );
   }
 
-  const role = (session.user as any)?.role;
+  const role = (session.user as unknown)?.role;
   if (!role || role.toUpperCase() !== 'ADMIN') {
     return NextResponse.json(
       { success: false, error: 'Forbidden - Admin access required' },

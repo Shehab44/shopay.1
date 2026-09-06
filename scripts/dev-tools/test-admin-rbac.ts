@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 function extractCookies(response: Response, initialCookie?: string): string {
   let cookieHeaders: string[] = [];
-  if (typeof (response.headers as any).getSetCookie === 'function') {
-    cookieHeaders = (response.headers as any).getSetCookie();
+  if (typeof (response.headers as unknown).getSetCookie === 'function') {
+    cookieHeaders = (response.headers as unknown).getSetCookie();
   } else {
     const raw = response.headers.get('set-cookie');
     if (raw) cookieHeaders = [raw];
@@ -38,7 +38,7 @@ async function testAdminRbac() {
   const adminPhone = '00011122244';
   const testPassword = 'TestPassword123!';
 
-  let targetProduct: any = null;
+  let targetProduct: Record<string, unknown> = null;
 
   try {
     console.log('=== [1] إعداد بيئة الفحص والمستخدمين التجريبيين ===');
@@ -176,8 +176,8 @@ async function testAdminRbac() {
 
     console.log('\n🎉 كفاءة الحماية 100%: تم التحقق بنجاح من كافة متطلبات الـ RBAC والدفاع المتعمق.');
 
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار RBAC:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار RBAC:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [5] تنظيف بيانات الاختبار من قاعدة البيانات ===');
@@ -187,8 +187,8 @@ async function testAdminRbac() {
       });
       console.log(`- تم حذف المستخدمين التجريبيين (${deletedUsers.count} مستخدم) بنجاح.`);
       console.log('✅ اكتمل التنظيف: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية بنسبة 100%.');
-    } catch (cleanupError: any) {
-      console.error('خطأ أثناء عملية التنظيف:', cleanupError.message);
+    } catch (cleanupError: unknown) {
+      console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();
     }
@@ -196,3 +196,4 @@ async function testAdminRbac() {
 }
 
 testAdminRbac();
+

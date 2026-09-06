@@ -3,7 +3,7 @@
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/lib/store/cartStore';
 
-export default function AddToCartButton({ product }: { product: any }) {
+export default function AddToCartButton({ product }: { product: unknown }) {
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAdd = () => {

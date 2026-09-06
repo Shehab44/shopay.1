@@ -20,9 +20,9 @@ function InlineCategoryEditor({
   categories,
   onUpdated,
 }: {
-  product: any;
+  product: unknown;
   categories: Category[];
-  onUpdated: (updatedProduct: any) => void;
+  onUpdated: (updatedProduct: unknown) => void;
 }) {
   const [selectedCatId, setSelectedCatId] = useState<string>(
     product.categoryId ? product.categoryId.toString() : ""
@@ -59,7 +59,7 @@ function InlineCategoryEditor({
       onUpdated(data.product);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Save product category error:", e);
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 3000);
@@ -119,13 +119,13 @@ export default function ProductListClient({
   noImage,
   selectedCategoryId
 }: { 
-  initialProducts: any[];
+  initialProducts: unknown[];
   categories?: Category[];
   q: string;
   noImage: boolean;
   selectedCategoryId?: number | null;
 }) {
-  const [products, setProducts] = useState<any[]>(initialProducts);
+  const [products, setProducts] = useState<unknown[]>(initialProducts);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialProducts.length === 30);
   const [prevInitialProducts, setPrevInitialProducts] = useState(initialProducts);
@@ -142,10 +142,10 @@ export default function ProductListClient({
 
   // Status Modal States
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [selectedProductForStatus, setSelectedProductForStatus] = useState<any>(null);
+  const [selectedProductForStatus, setSelectedProductForStatus] = useState<unknown>(null);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
-  const handleToggleStatusClick = (product: any) => {
+  const handleToggleStatusClick = (product: unknown) => {
     setSelectedProductForStatus(product);
     setIsStatusModalOpen(true);
   };
@@ -219,7 +219,7 @@ export default function ProductListClient({
     };
   }, [hasMore, isLoading, loadMore]);
 
-  const handleProductUpdated = (updatedProduct: any) => {
+  const handleProductUpdated = (updatedProduct: unknown) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p))
     );

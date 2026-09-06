@@ -17,7 +17,7 @@ export async function getMoreProducts(
     throw new Error('Unauthorized: Admin access required');
   }
 
-  const where: any = {};
+  const where: Record<string, unknown> = {};
   if (q) {
     where.OR = [
       { nameAr: { contains: q } },
@@ -42,13 +42,13 @@ export async function getMoreProducts(
   return products;
 }
 
-export async function updateProduct(id: number, data: any) {
+export async function updateProduct(id: number, data: unknown) {
   const auth = await requireAdmin();
   if (auth instanceof NextResponse) {
     throw new Error('Unauthorized: Admin access required');
   }
 
-  const updateData: any = {};
+  const updateData: Record<string, unknown> = {};
   if (data.nameAr !== undefined) updateData.nameAr = data.nameAr;
   if (data.price !== undefined) updateData.price = parseFloat(data.price);
   if (data.isActive !== undefined) updateData.isActive = data.isActive;

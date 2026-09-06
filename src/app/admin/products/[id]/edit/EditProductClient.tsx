@@ -6,7 +6,7 @@ import { updateProduct } from '../../actions';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 
-export default function EditProductClient({ product }: { product: any }) {
+export default function EditProductClient({ product }: { product: unknown }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({

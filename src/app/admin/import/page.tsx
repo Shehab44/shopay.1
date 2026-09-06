@@ -44,8 +44,8 @@ export default function AdminImportPage() {
       if (!res.ok) throw new Error(data.error || "فشل تحليل الملف");
       
       setPreview(data);
-    } catch (err: any) {
-      setErrorMsg(err.message);
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
@@ -71,8 +71,8 @@ export default function AdminImportPage() {
       setSuccess(true);
       setPreview(null);
       setFile(null);
-    } catch (err: any) {
-      setErrorMsg(err.message);
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }

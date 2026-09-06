@@ -15,7 +15,7 @@ export default withAuth(
         );
       }
 
-      const role = (token as any)?.role;
+      const role = (token as unknown)?.role;
       if (!role || role.toUpperCase() !== "ADMIN") {
         return NextResponse.json(
           { success: false, error: "Forbidden - Admin access required" },
@@ -28,7 +28,7 @@ export default withAuth(
 
     // Admin dashboard UI pages protection
     if (pathname.startsWith("/admin")) {
-      const role = (token as any)?.role;
+      const role = (token as unknown)?.role;
       if (!token || !role || role.toUpperCase() !== "ADMIN") {
         return NextResponse.redirect(new URL("/login", req.url));
       }

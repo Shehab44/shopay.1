@@ -37,7 +37,7 @@ export async function PATCH(
     });
 
     return NextResponse.json({ success: true, order: updatedOrder });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update order status error:', error);
     return NextResponse.json({ error: 'حدث خطأ أثناء تحديث حالة الطلب' }, { status: 500 });
   }

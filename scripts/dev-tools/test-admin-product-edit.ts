@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 function extractCookies(response: Response, initialCookie?: string): string {
   let cookieHeaders: string[] = [];
-  if (typeof (response.headers as any).getSetCookie === 'function') {
-    cookieHeaders = (response.headers as any).getSetCookie();
+  if (typeof (response.headers as unknown).getSetCookie === 'function') {
+    cookieHeaders = (response.headers as unknown).getSetCookie();
   } else {
     const raw = response.headers.get('set-cookie');
     if (raw) cookieHeaders = [raw];
@@ -37,7 +37,7 @@ async function testAdminProductEdit() {
   const adminPhone = '00099988877';
   const testPassword = 'AdminPassword123!';
 
-  let targetProduct: any = null;
+  let targetProduct: Record<string, unknown> = null;
   let originalCategoryId: number | null = null;
   let originalSubCategoryLabel: string | null = null;
 
@@ -203,8 +203,8 @@ async function testAdminProductEdit() {
     console.log('🛡️ السيناريو (2) نجح: تم رفض معرف القسم غير الصالح بنجاح ومنع تلوث البيانات.');
 
     console.log('\n🎉 كفاءة التعديل والفرز اليدوي 100%: كافة الفحوصات تمت بنجاح.');
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار تعديل المنتجات:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار تعديل المنتجات:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [4] استعادة الحالة الأصلية للمنتج وتنظيف بيانات الاختبار ===');
@@ -225,8 +225,8 @@ async function testAdminProductEdit() {
       });
       console.log(`- تم حذف المشرف التجريبي (${deletedUsers.count} مستخدم).`);
       console.log('✅ اكتمل التنظيف والتراجع بنسبة 100%: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية.');
-    } catch (cleanupError: any) {
-      console.error('خطأ أثناء عملية التنظيف:', cleanupError.message);
+    } catch (cleanupError: unknown) {
+      console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();
     }
@@ -234,3 +234,4 @@ async function testAdminProductEdit() {
 }
 
 testAdminProductEdit();
+

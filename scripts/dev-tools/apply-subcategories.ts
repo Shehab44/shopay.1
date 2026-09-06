@@ -386,7 +386,7 @@ export async function applySubcategories(options?: { dryRun?: boolean; batchSize
           },
         })
       ),
-      { maxWait: 10000, timeout: 60000 } as any
+      { maxWait: 10000, timeout: 60000 } as unknown
     );
 
 
@@ -413,3 +413,4 @@ if (require.main === module) {
       await prisma.$disconnect();
     });
 }
+

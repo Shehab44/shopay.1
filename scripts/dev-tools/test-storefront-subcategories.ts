@@ -172,8 +172,8 @@ async function testStorefrontSubcategories() {
     console.log('🎉 كفاءة الفلترة على السيرفر 100%: كافة السيناريوهات اجتازت الفحص بنجاح تام.');
     console.log('🛡️ استعلام قراءة فقط (Strict Zero DB Writes): قاعدة البيانات لم تتأثر إطلاقاً.');
     console.log('================================================================================');
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار فلترة التفرعات:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار فلترة التفرعات:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     await prisma.$disconnect();
@@ -181,4 +181,5 @@ async function testStorefrontSubcategories() {
 }
 
 testStorefrontSubcategories();
+
 

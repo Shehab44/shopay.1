@@ -22,8 +22,8 @@ const prisma = new PrismaClient();
 
 function extractCookies(response: Response, initialCookie?: string): string {
   let cookieHeaders: string[] = [];
-  if (typeof (response.headers as any).getSetCookie === 'function') {
-    cookieHeaders = (response.headers as any).getSetCookie();
+  if (typeof (response.headers as unknown).getSetCookie === 'function') {
+    cookieHeaders = (response.headers as unknown).getSetCookie();
   } else {
     const raw = response.headers.get('set-cookie');
     if (raw) cookieHeaders = [raw];
@@ -114,7 +114,7 @@ async function testImportRollback() {
     console.log('✅ تم تسجيل دخول المدير التجريبي وتجهيز الجلسة.');
 
     // دالة مساعدة لإنشاء ملف إكسل بصيغة Buffer
-    const createExcelBuffer = async (rows: { matCode: string; name: string; price: any }[]) => {
+    const createExcelBuffer = async (rows: { matCode: string; name: string; price: unknown }[]) => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
       worksheet.columns = [
@@ -202,8 +202,8 @@ async function testImportRollback() {
     console.log('🛡️ السيناريو الثاني نجح بنسبة 100%: تم التراجع التام (All-or-Nothing Rollback) ولم يُحفظ أي سجل.');
     console.log('\n🎉 كفاءة العمليات الذرية 100%: تم اجتياز كلا السيناريوهين بنجاح تام!');
 
-  } catch (error: any) {
-    console.error('\n❌ فشل الاختبار:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل الاختبار:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [4] التنظيف الإلزامي الشامل واستعادة حالة قاعدة البيانات 100% ===');
@@ -219,8 +219,8 @@ async function testImportRollback() {
       console.log(`- تم حذف حساب المدير التجريبي (${deletedAdmin.count} مستخدم).`);
 
       console.log('✅ تم الانتهاء من التنظيف: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية بنسبة 100%.');
-    } catch (cleanupError: any) {
-      console.error('خطأ أثناء عملية التنظيف:', cleanupError.message);
+    } catch (cleanupError: unknown) {
+      console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();
     }

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function testOrderPriceTampering() {
   const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:3000';
   const testPhone = '00033322211';
-  let targetProduct: any = null;
+  let targetProduct: Record<string, unknown> = null;
   let originalStock = 0;
   let createdOrderId: number | null = null;
 
@@ -121,8 +121,8 @@ async function testOrderPriceTampering() {
 
     console.log('\n🎉 الفحص ناجح بنسبة 100%: تم عزل واحتساب أسعار الطلبات بالسيرفر بالكامل.');
 
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار عزل الأسعار:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار عزل الأسعار:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [4] تنظيف بيانات الاختبار وإعادة قاعدة البيانات لحالتها الأصلية 100% ===');
@@ -149,8 +149,8 @@ async function testOrderPriceTampering() {
       }
 
       console.log('✅ تم الانتهاء من التنظيف: قاعدة البيانات نظيفة 100%.');
-    } catch (cleanupErr: any) {
-      console.error('خطأ أثناء التنظيف:', cleanupErr.message);
+    } catch (cleanupErr: unknown) {
+      console.error('خطأ أثناء التنظيف:', (cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr)));
     } finally {
       await prisma.$disconnect();
     }
@@ -158,3 +158,4 @@ async function testOrderPriceTampering() {
 }
 
 testOrderPriceTampering();
+

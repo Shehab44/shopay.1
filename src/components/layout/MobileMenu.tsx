@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, User, Heart } from "lucide-react";
 
-export default function MobileMenu({ categories }: { categories: any[] }) {
+export default function MobileMenu({ categories }: { categories: unknown[] }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function MobileMenu({ categories }: { categories: any[] }) {
           
           <div className="h-px w-full bg-shopay-gray-light my-2"></div>
           
-          {categories.map((cat: any) => (
+          {categories.map((cat: unknown) => (
             <Link 
               key={cat.id} 
               onClick={() => setIsOpen(false)} 

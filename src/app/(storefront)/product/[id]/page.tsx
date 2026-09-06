@@ -16,5 +16,5 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  return <ProductClient product={product as any} />;
+  return <ProductClient product={product as unknown} />;
 }

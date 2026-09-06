@@ -6,7 +6,7 @@ import { revertSubcategories } from './revert-subcategories';
 const prisma = new PrismaClient();
 
 async function testSubcategoriesSchema() {
-  let targetProduct: any = null;
+  let targetProduct: Record<string, unknown> = null;
   let originalSubCategoryLabel: string | null = null;
   let originalCategoryId: number | null = null;
 
@@ -79,8 +79,8 @@ async function testSubcategoriesSchema() {
 
     console.log('\n🎉 كفاءة المعمارية والتراجع 100%: تم اجتياز الفحص بنجاح تام وتأكيد المعمارية غير المدمرة.');
 
-  } catch (error: any) {
-    console.error('\n❌ فشل اختبار معمارية التفرعات:', error.message || error);
+  } catch (error: unknown) {
+    console.error('\n❌ فشل اختبار معمارية التفرعات:', (error instanceof Error ? error.message : String(error)) || error);
     process.exitCode = 1;
   } finally {
     console.log('\n=== [4] التنظيف الإلزامي واستعادة الحالة الأصلية للمنتج ===');
@@ -93,8 +93,8 @@ async function testSubcategoriesSchema() {
         console.log(`- تم استعادة الحالة الأصلية للمنتج ID=${targetProduct.id} بنجاح.`);
       }
       console.log('✅ اكتمل التنظيف: قاعدة البيانات نظيفة ومطابقة لحالتها الأصلية بنسبة 100%.');
-    } catch (cleanupError: any) {
-      console.error('خطأ أثناء عملية التنظيف:', cleanupError.message);
+    } catch (cleanupError: unknown) {
+      console.error('خطأ أثناء عملية التنظيف:', (cleanupError instanceof Error ? cleanupError.message : String(cleanupError)));
     } finally {
       await prisma.$disconnect();
     }
@@ -102,3 +102,4 @@ async function testSubcategoriesSchema() {
 }
 
 testSubcategoriesSchema();
+

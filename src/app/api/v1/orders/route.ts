@@ -171,7 +171,7 @@ export async function POST(request: Request) {
         });
 
         if (updateResult.count === 0) {
-          const outOfStockErr: any = new Error('الكمية المطلوبة لم تعد متوفرة في المخزون أثناء معالجة الطلب');
+          const outOfStockErr: Record<string, unknown> = new Error('الكمية المطلوبة لم تعد متوفرة في المخزون أثناء معالجة الطلب');
           outOfStockErr.status = 400;
           throw outOfStockErr;
         }
@@ -181,11 +181,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, orderId: order.id });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create order error:', error);
-    if (error.status === 400) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if ((error instanceof Error ? error.status : String(error)) === 400) {
+      return NextResponse.json({ error: (error instanceof Error ? error.message : String(error)) }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message || 'فشل في حفظ الطلب' }, { status: 500 });
+    return NextResponse.json({ error: (error instanceof Error ? error.message : String(error)) || 'فشل في حفظ الطلب' }, { status: 500 });
   }
 }
