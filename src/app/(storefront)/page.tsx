@@ -32,7 +32,7 @@ export default async function Home() {
             </p>
             <Link 
               href="/category/103" 
-              className="inline-block bg-shopay-white text-shopay-purple font-bold py-3 px-8 rounded-full shadow-lg hover:bg-shopay-gray-light transition-colors transform hover:-translate-y-1"
+              className="inline-block bg-amber-400 text-shopay-black font-bold py-3 px-8 rounded-full shadow-lg hover:bg-amber-500 transition-colors transform hover:-translate-y-1"
             >
               تسوق الآن
             </Link>

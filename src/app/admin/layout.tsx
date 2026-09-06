@@ -38,26 +38,26 @@ export default function AdminLayout({
 
         
         <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-          <Link href="/admin" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-shopay-white/10 transition-colors">
+          <Link href="/admin" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
             <Home className="w-5 h-5 text-shopay-purple-light" />
             <span>لوحة القيادة</span>
           </Link>
-          <Link href="/admin/products" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-shopay-white/10 transition-colors">
+          <Link href="/admin/products" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
             <Package className="w-5 h-5 text-shopay-purple-light" />
             <span>إدارة المنتجات</span>
           </Link>
-          <Link href="/admin/orders" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-shopay-white/10 transition-colors">
+          <Link href="/admin/orders" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
             <ShoppingBag className="w-5 h-5 text-shopay-purple-light" />
             <span>الطلبات</span>
           </Link>
-          <Link href="/admin/import" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-shopay-white/10 transition-colors">
+          <Link href="/admin/import" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
             <UploadCloud className="w-5 h-5 text-shopay-purple-light" />
             <span>مزامنة الأسعار</span>
           </Link>
         </nav>
         
         <div className="p-4 border-t border-shopay-white/10">
-          <Link href="/" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-shopay-white/10 transition-colors text-shopay-gray-light/60">
+          <Link href="/" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors text-shopay-gray-light/60">
             <Settings className="w-5 h-5" />
             <span>العودة للمتجر</span>
           </Link>

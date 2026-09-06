@@ -245,10 +245,10 @@ export default function ProductListClient({
             {products.map(product => (
               <tr key={product.id} className="hover:bg-shopay-gray-light/30">
                 <td className="px-6 py-4 font-semibold text-shopay-black max-w-[280px]">
-                  {product.nameAr}
+                  <span>{product.nameAr}</span>
                 </td>
                 <td className="px-6 py-4 text-shopay-black/70 font-mono text-sm">
-                  {product.matCode}
+                  <span>{product.matCode}</span>
                 </td>
                 <td className="px-6 py-4">
                   <InlineCategoryEditor 

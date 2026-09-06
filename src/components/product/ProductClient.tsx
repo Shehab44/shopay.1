@@ -2,6 +2,7 @@
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import ProductImage from "../ui/ProductImage";
 import { Prisma } from "@prisma/client";
 import { ShoppingCart, Check, AlertCircle } from "lucide-react";
@@ -25,7 +26,7 @@ export default function ProductClient({ product }: { product: ProductWithCategor
       mainImageUrl: product.mainImageUrl || `/images/products/${product.matCode}.jpg`,
       quantity,
     });
-    alert('تم إضافة المنتج إلى السلة بنجاح!');
+    toast.success("تم إضافة المنتج إلى السلة بنجاح!");
   };
 
   return (
@@ -62,7 +63,7 @@ export default function ProductClient({ product }: { product: ProductWithCategor
 
 
 
-          <div className="text-4xl font-bold text-shopay-purple mb-6">
+          <div className="text-4xl font-bold text-shopay-purple mt-4 mb-6">
             {CURRENCY_SYMBOL}{product.price.toFixed(2)}
             <span className="text-base font-normal text-shopay-black/50 ml-2">
               سعر المنتج
@@ -70,29 +71,37 @@ export default function ProductClient({ product }: { product: ProductWithCategor
           </div>
 
           {/* Add to Cart */}
-          <div className="flex items-center gap-4 mt-auto">
-            <div className="flex items-center border border-shopay-gray-light rounded-full h-12 w-32 shrink-0">
+          <div className="mt-auto flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center border border-shopay-gray-light rounded-full h-12 w-32 shrink-0">
+                <button 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
+                >
+                  -
+                </button>
+                <div className="flex-1 text-center font-bold">{quantity}</div>
+                <button 
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
+                >
+                  +
+                </button>
+              </div>
+              
               <button 
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
+                onClick={handleAddToCart}
+                className="flex-1 bg-shopay-gray-light text-shopay-black h-12 rounded-full font-bold shadow-sm hover:bg-shopay-purple hover:text-shopay-white transition-colors flex items-center justify-center gap-2 border border-shopay-purple/20"
               >
-                -
-              </button>
-              <div className="flex-1 text-center font-bold">{quantity}</div>
-              <button 
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-full flex items-center justify-center text-shopay-black hover:text-shopay-purple"
-              >
-                +
+                <ShoppingCart className="w-5 h-5" />
+                أضف للسلة
               </button>
             </div>
-            
             <button 
               onClick={handleAddToCart}
-              className="flex-1 bg-shopay-gradient text-shopay-white h-12 rounded-full font-bold shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              className="w-full bg-shopay-gradient text-shopay-white h-12 rounded-full font-bold shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
             >
-              <ShoppingCart className="w-5 h-5" />
-              أضف للسلة
+              شراء الآن
             </button>
           </div>
 

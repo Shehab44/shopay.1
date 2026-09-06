@@ -9,7 +9,7 @@ export default async function Navbar() {
   return (
     <nav className="w-full bg-shopay-gradient">
       <div className="container mx-auto px-4">
-        <ul className="flex items-center gap-6 overflow-x-auto py-3 no-scrollbar whitespace-nowrap">
+        <ul className="flex items-center gap-4 overflow-x-auto md:flex-wrap md:overflow-visible py-3 no-scrollbar whitespace-nowrap md:whitespace-normal">
           <li className="flex-shrink-0">
             <Link href="/" className="text-shopay-white hover:text-shopay-gray-light font-bold text-sm transition-colors">
               الرئيسية

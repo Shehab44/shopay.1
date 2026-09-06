@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import Image, { ImageProps } from "next/image";
+import { PackageX } from "lucide-react";
 
 interface ProductImageProps extends Omit<ImageProps, "src"> {
   matCode: string;
@@ -9,32 +11,35 @@ interface ProductImageProps extends Omit<ImageProps, "src"> {
   databaseImageUrl?: string | null;
 }
 
-export default function ProductImage({ matCode, alt, databaseImageUrl, ...props }: ProductImageProps) {
-  // 1. First priority: Image from database if uploaded via admin later.
-  // 2. Second priority: Local file named by MatCode.
-  // 3. Fallback: Placeholder.
-  
+export default function ProductImage({ matCode, alt, databaseImageUrl, className, ...props }: ProductImageProps) {
   const initialSrc = databaseImageUrl || `/images/products/${matCode}.jpg`;
-  const fallbackSrc = `https://placehold.co/600x600/f5f5f7/5B2A6E`;
-
+  
   const [src, setSrc] = useState(initialSrc);
-  const [errorCount, setErrorCount] = useState(0);
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleError = () => {
-    // If we haven't tried the fallback yet, switch to it
-    if (errorCount === 0) {
-      setErrorCount(1);
-      setSrc(fallbackSrc);
-    }
-  };
+  if (hasError) {
+    return (
+      <div className={`flex items-center justify-center bg-shopay-gray-light text-shopay-black/30 w-full h-full min-h-[200px] ${className || ""}`}>
+         <PackageX className="w-12 h-12" />
+      </div>
+    );
+  }
 
   return (
-    <Image
-      src={src}
-      alt={alt}
-      onError={handleError}
-      unoptimized // Allows external domains and local static files to just work
-      {...props}
-    />
+    <>
+      {isLoading && (
+        <div className={`absolute inset-0 bg-shopay-gray-light animate-pulse ${className || ""}`} />
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        onError={() => setHasError(true)}
+        onLoad={() => setIsLoading(false)}
+        unoptimized
+        className={`${className || ""} ${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
+        {...props}
+      />
+    </>
   );
 }
