@@ -13,7 +13,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     }
   });
 
-  if (!product) {
+  if (!product || !product.isActive || product.stockQuantity <= 0) {
     notFound();
   }
 

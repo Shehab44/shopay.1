@@ -43,20 +43,16 @@ export async function POST(
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // 4. Upload to Cloudinary using upload_stream
-    const uploadResult = await new Promise<any>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'shopay/products',
-          public_id: `${product.matCode}_${Date.now()}`,
-          overwrite: true,
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-      uploadStream.end(buffer);
+    // 4. Convert to Base64 and upload (More reliable than upload_stream to prevent 499 Request Timeout)
+    const base64Data = buffer.toString("base64");
+    const mimeType = file.type || "image/jpeg";
+    const dataUri = `data:${mimeType};base64,${base64Data}`;
+
+    const uploadResult = await cloudinary.uploader.upload(dataUri, {
+      folder: 'shopay/products',
+      public_id: `${product.matCode}_${Date.now()}`,
+      overwrite: true,
+      timeout: 120000 // 120 seconds to prevent hanging
     });
 
     // 5. Delete Old Image from Cloudinary (if exists)

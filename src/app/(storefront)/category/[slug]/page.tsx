@@ -62,7 +62,8 @@ export default async function CategoryPage({
   const sort = resolvedSearchParams.sort as string || "newest";
 
   const whereClause: any = { 
-    isActive: true 
+    isActive: true,
+    stockQuantity: { gt: 0 }
   };
   
   if (!isAll && category) {

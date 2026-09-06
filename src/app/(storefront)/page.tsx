@@ -8,13 +8,13 @@ export default async function Home() {
   const featuredProducts = await prisma.product.findMany({
     take: 8,
     include: { category: true },
-    orderBy: { id: 'asc' }
+    orderBy: { id: 'asc' }, where: { isActive: true, stockQuantity: { gt: 0 } }
   });
 
   const newProducts = await prisma.product.findMany({
     take: 8,
     include: { category: true },
-    orderBy: { id: 'desc' }
+    orderBy: { id: 'desc' }, where: { isActive: true, stockQuantity: { gt: 0 } }
   });
 
   return (

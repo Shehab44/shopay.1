@@ -23,7 +23,7 @@ export default async function SearchPage({
 
   const products = await prisma.product.findMany({
     where: {
-      isActive: true,
+      isActive: true, stockQuantity: { gt: 0 },
       OR: [
         { nameAr: { contains: q } },
         { matCode: { contains: q } }
