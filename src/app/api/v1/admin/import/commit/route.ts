@@ -176,13 +176,7 @@ export async function POST(request: Request) {
               price: item.price,
               isActive
             },
-            create: { 
-              matCode: item.matCode, 
-              nameAr: item.productName, 
-              categoryId,
-              price: item.price,
-              isActive
-            },
+            create: { matCode: item.matCode, nameAr: item.productName, categoryId, price: item.price, isActive, stockQuantity: 9999 },
           });
           processed++;
         }
