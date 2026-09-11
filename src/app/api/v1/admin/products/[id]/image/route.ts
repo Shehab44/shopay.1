@@ -74,36 +74,25 @@ export async function POST(
       timeout: 120000 // 120 seconds to prevent hanging
     });
 
-    // 5. Delete Old Image from Cloudinary (if exists)
-    if (product.mainImageUrl && product.mainImageUrl.includes('cloudinary.com')) {
-      try {
-        // Extract public_id from Cloudinary URL
-        // Example URL: https://res.cloudinary.com/cloud_name/image/upload/v1234/shopay/products/code_123.jpg
-        const urlParts = product.mainImageUrl.split('/');
-        const folderIndex = urlParts.findIndex(part => part === 'shopay');
-        
-        if (folderIndex !== -1) {
-          const publicIdWithExt = urlParts.slice(folderIndex).join('/');
-          const publicId = publicIdWithExt.split('.')[0]; // remove extension
-          
-          await cloudinary.uploader.destroy(publicId);
-          console.log(`Deleted old image from Cloudinary: ${publicId}`);
-        }
-      } catch (delErr) {
-        console.error("Failed to delete old image from Cloudinary:", delErr);
-        // We don't throw here to ensure the update process finishes successfully.
+    // 5. Save uploaded image to ProductImage table (Gallery)
+    await prisma.productImage.create({
+      data: {
+        url: uploadResult.secure_url,
+        productId: id,
       }
-    }
-
-    // 6. Update Database
-    const updatedProduct = await prisma.product.update({
-      where: { id },
-      data: { mainImageUrl: uploadResult.secure_url },
     });
+
+    // 6. Backward Compatibility: Set mainImageUrl only if it's currently null
+    if (!product.mainImageUrl) {
+      await prisma.product.update({
+        where: { id },
+        data: { mainImageUrl: uploadResult.secure_url },
+      });
+    }
 
     return NextResponse.json({ 
       success: true, 
-      imageUrl: updatedProduct.mainImageUrl 
+      imageUrl: uploadResult.secure_url 
     });
     
   } catch (error: any) {
