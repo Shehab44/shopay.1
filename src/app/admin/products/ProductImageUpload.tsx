@@ -15,29 +15,53 @@ export default function ProductImageUpload({
   currentImageUrl: string | null 
 }) {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(currentImageUrl);
+  const [uploadedImages, setUploadedImages] = useState<string[]>(currentImageUrl ? [currentImageUrl] : []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Client-Side Validation
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('حجم إحدى الصور يتجاوز الحد المسموح 5MB');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('صيغة أحد الملفات غير مدعومة');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+    }
 
     setLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
+    
     try {
-      const res = await fetch(`/api/v1/admin/products/${productId}/image`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+      const newUrls: string[] = [];
+      // Upload files sequentially to prevent overwhelming the server
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const res = await fetch(`/api/v1/admin/products/${productId}/image`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          newUrls.push(data.imageUrl);
+        } else {
+          toast.error(data.error || 'فشل رفع إحدى الصور');
+        }
+      }
       
-      if (res.ok) {
-        setImageUrl(data.imageUrl);
-        toast.success('تم رفع الصورة بنجاح');
-      } else {
-        toast.error(data.error || 'فشل رفع الصورة');
+      if (newUrls.length > 0) {
+        setUploadedImages(prev => [...prev, ...newUrls]);
+        toast.success(`تم رفع ${newUrls.length} صورة بنجاح`);
       }
     } catch (err: unknown) {
       toast.error((err instanceof Error ? err.message : String(err)) || 'خطأ في الاتصال بالخادم');
@@ -49,25 +73,38 @@ export default function ProductImageUpload({
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-12 h-12 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center">
-        {loading ? (
-          <Loader2 className="w-5 h-5 text-shopay-purple animate-spin" />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-3">
+        {uploadedImages.length > 0 ? (
+          uploadedImages.map((url, idx) => (
+            <div key={idx} className="w-20 h-20 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center">
+              <ProductImage 
+                matCode={matCode} 
+                databaseImageUrl={url} 
+                alt={`صورة المنتج ${idx + 1}`} 
+                fill 
+                className="object-cover" 
+              />
+            </div>
+          ))
         ) : (
-          <ProductImage 
-            matCode={matCode} 
-            databaseImageUrl={imageUrl} 
-            alt="صورة المنتج" 
-            fill 
-            className="object-cover" 
-          />
+          <div className="w-20 h-20 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center text-xs text-shopay-black/50 text-center px-2">
+            لا توجد صور
+          </div>
+        )}
+        
+        {loading && (
+          <div className="w-20 h-20 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center">
+            <Loader2 className="w-6 h-6 text-shopay-purple animate-spin" />
+          </div>
         )}
       </div>
       
       <div>
         <input 
           type="file" 
-          accept="image/*" 
+          multiple
+          accept="image/jpeg, image/png, image/webp" 
           className="hidden" 
           ref={fileInputRef}
           onChange={handleUpload}
@@ -75,10 +112,10 @@ export default function ProductImageUpload({
         <button 
           onClick={() => fileInputRef.current?.click()}
           disabled={loading}
-          className="text-xs bg-shopay-black text-shopay-white px-3 py-1.5 rounded font-bold hover:bg-shopay-purple transition-colors disabled:opacity-50 flex items-center gap-1"
+          className="text-sm bg-shopay-black text-shopay-white px-4 py-2 rounded font-bold hover:bg-shopay-purple transition-colors disabled:opacity-50 flex items-center gap-2"
         >
-          <UploadCloud className="w-3 h-3" />
-          رفع صورة
+          <UploadCloud className="w-4 h-4" />
+          رفع صور متعددة
         </button>
       </div>
     </div>
