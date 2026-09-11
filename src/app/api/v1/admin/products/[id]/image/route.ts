@@ -16,6 +16,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 0. Fail Closed: Check Cloudinary Environment Variables
+    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET || !process.env.CLOUDINARY_CLOUD_NAME) {
+      return NextResponse.json(
+        { error: 'Server configuration error: Cloudinary keys missing' },
+        { status: 500 }
+      );
+    }
+
     // 1. Verify Authentication & RBAC (Defense-in-Depth)
     const authResult = await requireAdmin();
     if (authResult instanceof NextResponse) return authResult;
@@ -40,12 +48,23 @@ export async function POST(
       return NextResponse.json({ error: 'لم يتم العثور على صورة' }, { status: 400 });
     }
 
+    // Strict Size Validation (Max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 400 });
+    }
+
+    // Strict MIME Type Validation
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed' }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // 4. Convert to Base64 and upload (More reliable than upload_stream to prevent 499 Request Timeout)
     const base64Data = buffer.toString("base64");
-    const mimeType = file.type || "image/jpeg";
+    const mimeType = file.type;
     const dataUri = `data:${mimeType};base64,${base64Data}`;
 
     const uploadResult = await cloudinary.uploader.upload(dataUri, {
