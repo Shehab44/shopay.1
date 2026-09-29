@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/db";
-import ProductCard from "@/components/product/ProductCard";
-import Pagination from "@/components/ui/Pagination";
+import InfiniteProductGrid from "@/components/product/InfiniteProductGrid";
 import { Search as SearchIcon, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -148,21 +147,18 @@ export default async function SearchPage({
         {/* Results Grid */}
         <div className="w-full lg:w-3/4">
           {products.length > 0 ? (
-            <>
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {products.map(product => (
-                  <ProductCard key={product.id} product={product as any} />
-                ))}
-              </div>
-              
-              {totalPages > 1 && (
-                <Pagination 
-                  totalPages={totalPages} 
-                  currentPage={page} 
-                  createPageURL={(pageNumber) => buildUrl({ page: Number(pageNumber) })}
-                />
-              )}
-            </>
+            <InfiniteProductGrid
+              initialProducts={products}
+              totalCount={totalCount}
+              limit={limit}
+              searchParams={{
+                q,
+                categoryFilter,
+                minPrice,
+                maxPrice,
+                sort
+              }}
+            />
           ) : (
             <div className="text-center py-20 text-shopay-black/50 flex flex-col items-center bg-white rounded-xl border border-shopay-gray-light">
               <SearchIcon className="w-12 h-12 text-shopay-black/20 mb-4" />
