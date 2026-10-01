@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function WishlistPage() {
   return (
-    <div className="container mx-auto px-4 py-16 md:py-32 flex flex-col items-center justify-center text-center">
+    <div className="bg-shopay-white rounded-2xl border border-shopay-gray-light shadow-sm overflow-hidden min-h-[500px] flex flex-col items-center justify-center text-center p-8">
       <div className="w-24 h-24 bg-shopay-gray-light rounded-full flex items-center justify-center mb-6">
         <Heart className="w-12 h-12 text-shopay-black/30" />
       </div>
