@@ -14,6 +14,14 @@ export async function POST(request: Request) {
 
     // Get IP for rate limiting
     const ip = request.headers.get('x-forwarded-for') || 'unknown-ip';
+    
+    // Top-Level Rate Limit (Max 20 requests per 15 minutes per IP for any auth action to prevent SPAM)
+    const globalKey = `global_${ip}`;
+    const globalLimit = checkRateLimit(otpCache, globalKey, 20);
+    if (!globalLimit.success) {
+      return NextResponse.json({ error: 'طلبات كثيرة جداً، يرجى المحاولة لاحقاً.' }, { status: 429 });
+    }
+
     const rateLimitKey = `${ip}_${phone}`;
 
     if (action === 'request_otp') {
@@ -65,6 +73,13 @@ export async function POST(request: Request) {
     else if (action === 'verify_otp') {
       if (!fullName || !password || !otpCode) {
         return NextResponse.json({ error: 'جميع الحقول مطلوبة' }, { status: 400 });
+      }
+
+      // Add strict rate limiting for OTP guesses (Max 5 attempts)
+      const verifyLimitKey = `verify_${ip}_${phone}`;
+      const verifyLimit = checkRateLimit(otpCache, verifyLimitKey, 5);
+      if (!verifyLimit.success) {
+        return NextResponse.json({ error: 'تجاوزت الحد الأقصى للمحاولات الخاطئة. يرجى المحاولة لاحقاً.' }, { status: 429 });
       }
 
       // Verify OTP
