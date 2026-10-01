@@ -108,3 +108,88 @@ export async function POST(
     }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // 0. Fail Closed: Check Cloudinary Environment Variables
+    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET || !process.env.CLOUDINARY_CLOUD_NAME) {
+      return NextResponse.json(
+        { error: 'Server configuration error: Cloudinary keys missing' },
+        { status: 500 }
+      );
+    }
+
+    // 1. Verify Authentication & RBAC
+    const authResult = await requireAdmin();
+    if (authResult instanceof NextResponse) return authResult;
+
+    // 2. Validate Product
+    const resolvedParams = await params;
+    const id = parseInt(resolvedParams.id);
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'معرف المنتج غير صحيح' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const { imageUrl } = body;
+    
+    if (!imageUrl) {
+      return NextResponse.json({ error: 'لم يتم توفير رابط الصورة' }, { status: 400 });
+    }
+
+    // 3. Extract Cloudinary public_id from the URL
+    // URL looks like: https://res.cloudinary.com/cloud_name/image/upload/v1234567/shopay/products/matCode_timestamp.jpg
+    const urlParts = imageUrl.split('/');
+    const fileWithExtension = urlParts.pop(); // "matCode_timestamp.jpg"
+    const uploadIndex = urlParts.indexOf('upload');
+    
+    let publicId = '';
+    if (uploadIndex !== -1 && fileWithExtension) {
+       // Skip the version folder 'v1234567' by taking slice from uploadIndex + 2
+       const folderPath = urlParts.slice(uploadIndex + 2).join('/');
+       const fileName = fileWithExtension.split('.')[0];
+       publicId = folderPath ? `${folderPath}/${fileName}` : fileName;
+    }
+
+    // 4. Delete from Cloudinary if publicId was parsed
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // 5. Delete from DB (ProductImage)
+    await prisma.productImage.deleteMany({
+      where: {
+        productId: id,
+        url: imageUrl
+      }
+    });
+
+    // 6. Check if it's the main image, if so set to null or next available
+    const product = await prisma.product.findUnique({ 
+      where: { id },
+      include: { images: { orderBy: { createdAt: 'asc' } } }
+    });
+    
+    if (product && product.mainImageUrl === imageUrl) {
+      // images array might still contain the deleted image if it's in a transaction or caching, 
+      // but we used deleteMany above, so it should be accurate.
+      const nextMainImage = product.images.length > 0 ? product.images[0].url : null;
+      await prisma.product.update({
+        where: { id },
+        data: { mainImageUrl: nextMainImage }
+      });
+    }
+
+    return NextResponse.json({ success: true, message: 'تم حذف الصورة بنجاح' });
+  } catch (error: any) {
+    console.error('Delete image error:', error);
+    return NextResponse.json({ 
+      error: 'حدث خطأ أثناء حذف الصورة',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
+  }
+}
+

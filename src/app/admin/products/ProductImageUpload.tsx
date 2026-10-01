@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { UploadCloud, Loader2 } from "lucide-react";
+import { UploadCloud, Loader2, X } from "lucide-react";
 import ProductImage from "@/components/ui/ProductImage";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ export default function ProductImageUpload({
   currentImageUrl: string | null 
 }) {
   const [loading, setLoading] = useState(false);
+  const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [uploadedImages, setUploadedImages] = useState<string[]>(currentImageUrl ? [currentImageUrl] : []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,19 +73,63 @@ export default function ProductImageUpload({
     }
   };
 
+  const handleDelete = async (url: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذه الصورة نهائياً؟')) return;
+    
+    setDeletingUrl(url);
+    try {
+      const res = await fetch(`/api/v1/admin/products/${productId}/image`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setUploadedImages(prev => prev.filter(img => img !== url));
+        toast.success('تم حذف الصورة بنجاح');
+      } else {
+        toast.error(data.error || 'فشل حذف الصورة');
+      }
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : String(err)) || 'خطأ في الاتصال بالخادم');
+    } finally {
+      setDeletingUrl(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-3">
         {uploadedImages.length > 0 ? (
           uploadedImages.map((url, idx) => (
-            <div key={idx} className="w-20 h-20 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center">
+            <div key={idx} className="w-20 h-20 rounded border border-shopay-black/10 overflow-hidden relative shrink-0 bg-shopay-gray-light flex items-center justify-center group">
               <ProductImage 
                 matCode={matCode} 
                 databaseImageUrl={url} 
                 alt={`صورة المنتج ${idx + 1}`} 
                 fill 
-                className="object-cover" 
+                className={`object-cover ${deletingUrl === url ? 'opacity-50' : ''}`} 
               />
+              
+              {/* Delete Button */}
+              {deletingUrl === url ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <Loader2 className="w-5 h-5 text-white animate-spin" />
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleDelete(url)}
+                  disabled={deletingUrl !== null || loading}
+                  className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="حذف الصورة"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
           ))
         ) : (
@@ -111,7 +156,7 @@ export default function ProductImageUpload({
         />
         <button 
           onClick={() => fileInputRef.current?.click()}
-          disabled={loading}
+          disabled={loading || deletingUrl !== null}
           className="text-sm bg-shopay-black text-shopay-white px-4 py-2 rounded font-bold hover:bg-shopay-purple transition-colors disabled:opacity-50 flex items-center gap-2"
         >
           <UploadCloud className="w-4 h-4" />
