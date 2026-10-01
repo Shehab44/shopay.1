@@ -12,11 +12,10 @@ interface ProductImageProps extends Omit<ImageProps, "src"> {
 }
 
 export default function ProductImage({ matCode, alt, databaseImageUrl, className, ...props }: ProductImageProps) {
-  const initialSrc = databaseImageUrl || `/images/products/${matCode}.jpg`;
-  
-  const [src, setSrc] = useState(initialSrc);
-  const [hasError, setHasError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // Since public/images/products doesn't exist, we only rely on databaseImageUrl
+  const [src, setSrc] = useState(databaseImageUrl || "");
+  const [hasError, setHasError] = useState(!databaseImageUrl);
+  const [isLoading, setIsLoading] = useState(!!databaseImageUrl);
 
   if (hasError) {
     return (
