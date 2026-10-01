@@ -46,6 +46,14 @@ export default function AdminLayout({
             <Package className="w-5 h-5 text-shopay-purple-light" />
             <span>إدارة المنتجات</span>
           </Link>
+          <Link href="/admin/categories" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
+            <Package className="w-5 h-5 text-shopay-purple-light" />
+            <span>صور الأقسام</span>
+          </Link>
+          <Link href="/admin/banners" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
+            <Package className="w-5 h-5 text-shopay-purple-light" />
+            <span>البانرات الإعلانية</span>
+          </Link>
           <Link href="/admin/orders" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-shopay-white/10 transition-colors">
             <ShoppingBag className="w-5 h-5 text-shopay-purple-light" />
             <span>الطلبات</span>

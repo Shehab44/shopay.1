@@ -12,10 +12,22 @@ model Category {
   codePrefix   String    @unique @map("code_prefix")
   nameAr       String    @map("name_ar")
   nameEn       String?   @map("name_en")
+  imageUrl     String?   @map("image_url")
   displayOrder Int       @default(0) @map("display_order")
   products     Product[]
 
   @@map("categories")
+}
+
+model Banner {
+  id           Int       @id @default(autoincrement())
+  imageUrl     String    @map("image_url")
+  linkUrl      String?   @map("link_url")
+  isActive     Boolean   @default(true) @map("is_active")
+  displayOrder Int       @default(0) @map("display_order")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("banners")
 }
 
 model Product {

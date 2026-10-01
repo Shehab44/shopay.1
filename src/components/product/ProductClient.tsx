@@ -4,9 +4,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import ProductImage from "../ui/ProductImage";
 import { Prisma } from "@prisma/client";
-import { ShoppingCart, Check, AlertCircle, Info, ShieldCheck, Truck } from "lucide-react";
 import { useCartStore } from "@/lib/store/cartStore";
-import { motion } from "framer-motion";
+import { Heart, Share2, Plus, Minus, Gift } from "lucide-react";
+import Link from "next/link";
 
 type ProductWithCategory = Prisma.ProductGetPayload<{
   include: { category: true }
@@ -28,137 +28,150 @@ export default function ProductClient({ product }: { product: ProductWithCategor
     toast.success("تم إضافة المنتج إلى السلة بنجاح!");
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8 md:py-12 min-h-screen">
-      {/* Breadcrumb */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        className="text-sm text-shopay-black/50 mb-8 flex items-center gap-2 font-medium"
-      >
-        <span className="hover:text-shopay-purple cursor-pointer transition-colors">الرئيسية</span>
-        <span>/</span>
-        <span className="hover:text-shopay-purple cursor-pointer transition-colors">{product.category?.nameAr || "قسم عام"}</span>
-        <span>/</span>
-        <span className="text-shopay-black font-bold truncate">{product.nameAr}</span>
-      </motion.div>
+  const deliveryDate = new Date();
+  deliveryDate.setDate(deliveryDate.getDate() + 3);
+  const formattedDate = deliveryDate.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-        {/* Product Image */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          transition={{ duration: 0.4 }}
-          className="bg-shopay-white rounded-3xl aspect-square relative overflow-hidden border border-shopay-gray-light shadow-lg flex items-center justify-center p-8 group"
-        >
-          <div className="w-full h-full relative transition-transform duration-500 group-hover:scale-105">
+  return (
+    <div className="bg-gray-50 min-h-screen py-8">
+      <div className="container mx-auto px-4 max-w-7xl">
+        
+        {/* Breadcrumb */}
+        <div className="text-sm text-gray-500 mb-6 flex items-center gap-2">
+          <Link href="/" className="hover:text-shopay-purple transition-colors">الصفحة الرئيسية</Link>
+          <span>/</span>
+          <Link href={`/category/${product.categoryId}`} className="hover:text-shopay-purple transition-colors">{product.category?.nameAr || "قسم عام"}</Link>
+          <span>/</span>
+          <span className="text-gray-800">{product.nameAr}</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Main Image (Right Side in RTL) */}
+          <div className="lg:col-span-5 bg-white rounded-3xl p-8 flex items-center justify-center border border-gray-100 shadow-sm aspect-square relative">
             <ProductImage
               matCode={product.matCode}
               databaseImageUrl={product.mainImageUrl}
               alt={product.nameAr}
               fill
-              className="object-contain"
+              className="object-contain hover:scale-105 transition-transform duration-500"
             />
           </div>
-          {product.isFeatured && (
-            <div className="absolute top-6 right-6 bg-shopay-purple text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md z-10">
-              منتج مميز
-            </div>
-          )}
-        </motion.div>
 
-        {/* Product Details */}
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex flex-col"
-        >
-          <div className="mb-3 text-shopay-black/50 text-sm font-bold bg-shopay-gray-light w-fit px-3 py-1 rounded-md">
-            رمز المنتج: <span dir="ltr">{product.matCode}</span>
-          </div>
-          
-          <h1 className="text-3xl md:text-4xl font-black text-shopay-black mb-6 leading-tight">
-            {product.nameAr}
-          </h1>
+          {/* Product Details (Middle) */}
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+              <Link href={`/category/${product.categoryId}`} className="text-shopay-purple font-bold text-sm mb-2 block hover:underline">
+                {product.category?.nameAr || "قسم عام"}
+              </Link>
+              
+              <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 leading-snug">
+                {product.nameAr}
+              </h1>
 
-          <div className="flex items-baseline gap-3 mb-8">
-            <span className="text-5xl font-black text-shopay-purple">
-              {CURRENCY_SYMBOL}{product.price.toFixed(2)}
-            </span>
-            <span className="text-lg font-medium text-shopay-black/50">شامل الضريبة</span>
-          </div>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-3xl font-black text-gray-900">
+                  {product.price.toFixed(2)}
+                </span>
+                <span className="text-lg font-bold text-gray-600">{CURRENCY_SYMBOL}</span>
+                <span className="text-sm text-gray-400 mr-2">شامل ضريبة القيمة المضافة</span>
+              </div>
 
-          {/* Description Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-shopay-black flex items-center gap-2 mb-3">
-              <Info className="w-5 h-5 text-shopay-purple" />
-              وصف المنتج
-            </h3>
-            <div className="bg-shopay-white border border-shopay-gray-light p-5 rounded-2xl shadow-sm text-shopay-black/80 leading-relaxed min-h-[100px]">
-              {product.description ? (
-                <p className="whitespace-pre-wrap">{product.description}</p>
-              ) : (
-                <p className="text-shopay-black/40 italic text-center py-4">لم يتم إضافة وصف مفصل لهذا المنتج بعد.</p>
-              )}
+              {/* Fake Tabby Widget */}
+              <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between border border-gray-100 mb-8">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-700">ادفع 4 أقساط شهرية بقيمة {(product.price / 4).toFixed(2)} {CURRENCY_SYMBOL}</span>
+                </div>
+                <div className="flex items-center gap-1 font-black text-xs px-2 py-1 bg-[#3EFFB0] rounded">
+                  tabby
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="font-bold text-lg mb-4 text-gray-900 border-b border-gray-100 pb-2">الوصف</h3>
+                <div className="text-gray-600 leading-relaxed text-sm whitespace-pre-wrap">
+                  {product.description || "لم يتم إضافة وصف مفصل لهذا المنتج بعد."}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Add to Cart Controls */}
-          <div className="mt-auto bg-shopay-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-shopay-gray-light">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center bg-shopay-gray-light rounded-full h-14 w-36 shrink-0 border border-shopay-black/5">
+          {/* Action Sidebar (Left Side in RTL) */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sticky top-24">
+              
+              <div className="text-center mb-6">
+                <div className="text-gray-500 text-sm mb-1">يصل خلال</div>
+                <div className="font-bold text-gray-900">{formattedDate}</div>
+              </div>
+
+              {/* Quantity Selector */}
+              <div className="flex items-center justify-center bg-gray-50 rounded-full h-12 mb-4 border border-gray-100">
                 <button 
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-12 h-full flex items-center justify-center text-xl text-shopay-black hover:text-shopay-purple transition-colors font-medium"
+                  className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-shopay-purple"
                 >
-                  -
+                  <Minus className="w-4 h-4" />
                 </button>
-                <div className="flex-1 text-center font-bold text-lg select-none">{quantity}</div>
+                <div className="flex-1 text-center font-bold">{quantity}</div>
                 <button 
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-12 h-full flex items-center justify-center text-xl text-shopay-black hover:text-shopay-purple transition-colors font-medium"
+                  className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-shopay-purple"
                 >
-                  +
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
-              
-              <button 
-                onClick={handleAddToCart}
-                className="flex-1 bg-shopay-purple/10 text-shopay-purple h-14 rounded-full font-bold hover:bg-shopay-purple hover:text-white transition-all duration-300 flex items-center justify-center gap-2 border border-shopay-purple/20"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                أضف للسلة
-              </button>
+
+              <div className="flex flex-col gap-3 mb-6">
+                <button 
+                  onClick={handleAddToCart}
+                  className="w-full bg-shopay-purple text-white h-12 rounded-full font-bold shadow-sm hover:bg-shopay-purple/90 transition-colors"
+                >
+                  أضف إلى السلة
+                </button>
+                <button 
+                  onClick={() => {
+                    handleAddToCart();
+                    window.location.href = '/checkout';
+                  }}
+                  className="w-full bg-white text-shopay-purple border-2 border-shopay-purple h-12 rounded-full font-bold shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  اشتر الآن
+                </button>
+              </div>
+
+              <div className="space-y-4 border-t border-gray-100 pt-6">
+                <button 
+                  onClick={() => toast.success("تمت الإضافة لقائمة الرغبات")}
+                  className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-shopay-purple font-medium"
+                >
+                  <span>أضف إلى قائمة الرغبات</span>
+                  <Heart className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => toast.success("ميزة السجل ستتوفر قريباً")}
+                  className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-shopay-purple font-medium"
+                >
+                  <span>أضف إلى السجل</span>
+                  <Gift className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("تم نسخ رابط المنتج");
+                  }}
+                  className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-shopay-purple font-medium"
+                >
+                  <span>مشاركة</span>
+                  <Share2 className="w-4 h-4" />
+                </button>
+              </div>
+
             </div>
-            <button 
-              onClick={() => {
-                handleAddToCart();
-                window.location.href = '/checkout';
-              }}
-              className="w-full bg-shopay-gradient text-white h-14 rounded-full font-bold shadow-md hover:shadow-lg hover:opacity-95 transition-all flex items-center justify-center gap-2 text-lg"
-            >
-              شراء الآن
-            </button>
           </div>
 
-          {/* Trust Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-            <div className="flex flex-col items-center justify-center p-4 bg-shopay-gray-light/50 rounded-2xl text-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-shopay-purple" />
-              <span className="text-xs font-bold text-shopay-black/70">منتج أصلي 100%</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-shopay-gray-light/50 rounded-2xl text-center gap-2">
-              <AlertCircle className="w-6 h-6 text-shopay-purple" />
-              <span className="text-xs font-bold text-shopay-black/70">إرجاع سهل خلال 14 يوم</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-shopay-gray-light/50 rounded-2xl text-center gap-2">
-              <Truck className="w-6 h-6 text-shopay-purple" />
-              <span className="text-xs font-bold text-shopay-black/70">شحن سريع وآمن</span>
-            </div>
-          </div>
-          
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import prisma from '@/lib/db';
+import { Menu } from 'lucide-react';
 
 export default async function Navbar() {
   const categories = await prisma.category.findMany({
@@ -7,24 +8,18 @@ export default async function Navbar() {
   });
 
   return (
-    <nav className="w-full bg-shopay-gradient">
-      <div className="container mx-auto px-4">
-        <ul className="flex items-center gap-4 overflow-x-auto md:flex-wrap md:overflow-visible py-3 no-scrollbar whitespace-nowrap md:whitespace-normal">
-          <li className="flex-shrink-0">
-            <Link href="/" className="text-shopay-white hover:text-shopay-gray-light font-bold text-sm transition-colors">
-              الرئيسية
-            </Link>
-          </li>
-          <li className="flex-shrink-0">
-            <Link href="/category/all" className="text-shopay-white/90 hover:text-shopay-white font-bold text-sm transition-colors">
-              الكل
-            </Link>
-          </li>
+    <nav className="w-full bg-shopay-purple text-white shadow-md">
+      <div className="container mx-auto px-4 flex items-center">
+        <Link href="/category/all" className="flex items-center gap-2 bg-black/10 hover:bg-black/20 px-6 py-3 font-bold transition-colors border-l border-white/10 shrink-0">
+          <Menu className="w-5 h-5" />
+          الكل
+        </Link>
+        <ul className="flex items-center overflow-x-auto no-scrollbar whitespace-nowrap px-4 py-3 gap-6 flex-1">
           {categories.map((category) => (
             <li key={category.id} className="flex-shrink-0">
               <Link 
-                href={`/category/${category.codePrefix}`} 
-                className="text-shopay-white/80 hover:text-shopay-white font-medium text-sm transition-colors"
+                href={`/category/${category.id}`} 
+                className="text-white hover:text-amber-400 font-bold text-sm transition-colors"
               >
                 {category.nameAr}
               </Link>
