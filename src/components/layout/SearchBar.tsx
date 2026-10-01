@@ -80,6 +80,8 @@ export default function SearchBar({ className = "" }: { className?: string }) {
     <div className={`relative ${className}`} ref={dropdownRef}>
       <form onSubmit={handleSearch} className="relative">
         <input 
+          id="search-input"
+          name="q"
           type="text" 
           value={query}
           onChange={(e) => setQuery(e.target.value)}
