@@ -12,6 +12,7 @@ export default function EditProductClient({ product }: { product: any }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nameAr: product.nameAr,
+    description: product.description || '',
     price: product.price,
     isActive: product.isActive
   });
@@ -44,6 +45,16 @@ export default function EditProductClient({ product }: { product: any }) {
       </div>
 
       <div>
+        <label className="block text-sm font-semibold text-shopay-black mb-2">الوصف</label>
+        <textarea 
+          value={formData.description}
+          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          className="w-full bg-shopay-gray-light text-shopay-black px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-shopay-purple/50 min-h-[120px]"
+          placeholder="اكتب وصف المنتج هنا لتشجيع العميل على الشراء..."
+        ></textarea>
+      </div>
+
+      <div>
         <label className="block text-sm font-semibold text-shopay-black mb-2">السعر</label>
         <input 
           type="number" 
@@ -60,7 +71,7 @@ export default function EditProductClient({ product }: { product: any }) {
           type="checkbox" 
           checked={formData.isActive}
           onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-          className="rounded text-shopay-purple focus:ring-shopay-purple"
+          className="rounded text-shopay-purple focus:ring-shopay-purple w-5 h-5"
         />
         <label className="text-sm font-semibold text-shopay-black">منتج نشط (يظهر في المتجر)</label>
       </div>

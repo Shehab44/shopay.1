@@ -27,12 +27,12 @@ export default function CheckoutPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true);
-      if (items.length === 0) {
+      if (items.length === 0 && !success) {
         router.push("/cart");
       }
     }, 0);
     return () => clearTimeout(timer);
-  }, [items.length, router]);
+  }, [items.length, router, success]);
 
   const handleSubmit = async (e: React.FormEvent, viaWhatsapp: boolean = false) => {
     e.preventDefault();

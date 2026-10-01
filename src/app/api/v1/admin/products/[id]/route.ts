@@ -54,6 +54,7 @@ export async function PUT(
     const updateData: import('@prisma/client').Prisma.ProductUpdateInput = {};
 
     if (body.nameAr !== undefined) updateData.nameAr = body.nameAr;
+    if (body.description !== undefined) updateData.description = body.description;
     if (body.price !== undefined) updateData.price = parseFloat(body.price);
     if (body.isActive !== undefined) updateData.isActive = Boolean(body.isActive);
     if (body.stockQuantity !== undefined) updateData.stockQuantity = parseInt(body.stockQuantity);

@@ -51,6 +51,7 @@ export async function updateProduct(id: number, data: any) {
 
   const updateData: Record<string, any> = {};
   if (data.nameAr !== undefined) updateData.nameAr = data.nameAr;
+  if (data.description !== undefined) updateData.description = data.description;
   if (data.price !== undefined) updateData.price = parseFloat(data.price);
   if (data.isActive !== undefined) updateData.isActive = data.isActive;
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId ? parseInt(data.categoryId) : null;
@@ -65,4 +66,3 @@ export async function updateProduct(id: number, data: any) {
   revalidatePath('/admin/products');
   return updated;
 }
-
