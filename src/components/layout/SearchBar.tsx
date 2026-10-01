@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 interface Suggestion {
   id: number;
@@ -121,7 +122,7 @@ export default function SearchBar({ className = "" }: { className?: string }) {
                       <p className="text-xs text-shopay-black/50">{product.matCode}</p>
                     </div>
                     <div className="text-sm font-bold text-shopay-purple">
-                      {product.price} ر.س
+                      {CURRENCY_SYMBOL}{product.price}
                     </div>
                   </Link>
                 </li>
